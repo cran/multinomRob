@@ -11,7 +11,7 @@
 #  http://jsekhon.fas.harvard.edu/
 #  jsekhon@fas.harvard.edu
 #
-#  $Id: multinomLQD.R,v 1.1 2004/02/18 07:17:45 wrm1 Exp $
+#  $Id: multinomLQD.R,v 1.2 2004/03/04 02:08:17 wrm1 Exp $
 #
 
 ##
@@ -38,7 +38,8 @@ fit.multinomial.C.lqd2 <- function(foo,X,Y,Ypos,xvec,tvec,ncats,nvars,nvars.uniq
                  as.real(tmp.vec),
                  as.real(Y),
                  as.real(X),
-                 as.real(TotalY))
+                 as.real(TotalY),
+                 PACKAGE="multinomRob")
            );
   }
   else {

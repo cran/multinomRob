@@ -11,7 +11,7 @@
 #  http://jsekhon.fas.harvard.edu/
 #  jsekhon@fas.harvard.edu
 #
-#  $Id: genoudRob.R,v 1.3 2004/02/14 22:21:35 wrm1 Exp $
+#  $Id: genoudRob.R,v 1.4 2004/03/04 02:08:17 wrm1 Exp $
 #
 ###################################
 #New Front End for Genoud, with tuned defaults
@@ -232,18 +232,19 @@ genoudRob <- function(fn,nvars,starting.values,genoud.parms)
 
 
   gout <- .Call("rgenoud", as.function(fn), new.env(),
-               as.integer(nvars), as.integer(pop.size), as.integer(max.generations),
-               as.integer(wait.generations),
-               as.integer(nStartingValues), as.vector(starting.values),
-               as.vector(P), as.matrix(Domains),
-               as.integer(max), as.integer(gradient.check), as.integer(boundary.enforcement),
-               as.double(solution.tolerance), as.integer(BFGS), as.integer(data.type.int),
-               as.integer(provide.seeds), as.integer(unif.seed), as.integer(int.seed),
-               as.integer(print.level), as.integer(share.type), as.integer(instance.number),
-               as.integer(MemoryMatrix), as.integer(Debug),
-               as.character(output.path), as.integer(output.type), as.character(project.path),
-               as.integer(hard.generation.limit),
-               as.function(genoud.optim.wrapper101), as.integer(roptim));
+                as.integer(nvars), as.integer(pop.size), as.integer(max.generations),
+                as.integer(wait.generations),
+                as.integer(nStartingValues), as.vector(starting.values),
+                as.vector(P), as.matrix(Domains),
+                as.integer(max), as.integer(gradient.check), as.integer(boundary.enforcement),
+                as.double(solution.tolerance), as.integer(BFGS), as.integer(data.type.int),
+                as.integer(provide.seeds), as.integer(unif.seed), as.integer(int.seed),
+                as.integer(print.level), as.integer(share.type), as.integer(instance.number),
+                as.integer(MemoryMatrix), as.integer(Debug),
+                as.character(output.path), as.integer(output.type), as.character(project.path),
+                as.integer(hard.generation.limit),
+                as.function(genoud.optim.wrapper101), as.integer(roptim),
+                PACKAGE="rgenoud");
 
   if (hessian==TRUE)
     {

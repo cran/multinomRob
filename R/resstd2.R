@@ -11,7 +11,7 @@
 #  http://jsekhon.fas.harvard.edu/
 #  jsekhon@fas.harvard.edu
 #
-#  $Id: resstd2.R,v 1.4 2004/02/14 22:21:35 wrm1 Exp $
+#  $Id: resstd2.R,v 1.5 2004/03/04 02:08:17 wrm1 Exp $
 #
 
 # probfunc: matrix of estimated probabilities
@@ -112,7 +112,8 @@ ResStd  <- function(nobs, ncats, nvars.total, nvars.unique,
     SresRaw  <- .Call("InResStd", as.integer(nobs),  as.integer(ncats),
                       as.integer(nvars.total), as.integer(nvars.unique),
                       as.real(tvec), as.real(Y), as.real(X),
-                      as.real(weights), as.real(SresRaw));
+                      as.real(weights), as.real(SresRaw),
+                      PACKAGE="multinomRob");
     return(SresRaw);
   }
 
@@ -123,6 +124,7 @@ kth.smallest  <- function(SortVector, obs, k)
       return(-1);
     }
     return(.Call("kthSmallest",
-                 as.real(SortVector), as.integer(obs), as.integer(k)));    
+                 as.real(SortVector), as.integer(obs), as.integer(k),
+                 PACKAGE="multinomRob"));    
   } #end of kth.smallest
 
