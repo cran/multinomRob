@@ -25,7 +25,7 @@ multinomRob <-
            equality=NULL,  # list of lists of parameter equality constraints
            genoud.parms   = NULL, ## can be NULL, single, or list
            print.level    = 0,
-           iter = TRUE,   # should we iterate
+           iter = FALSE,   # should we iterate
            maxiter = 10,  # maximum number of iterations before we stop
            multinom.t=1,  # 0=no, 1=yes, 2=force should we do multinom-t for starting values
            multinom.t.df=NA #if set, the multivariate-t function is FORCED to use this DF 
@@ -578,7 +578,31 @@ multinomRob <-
       mnl1  <- NULL;
     if (!exists("multinomT.foo"))
       multinomT.foo  <- NULL;
-      
+
+    #Rotated Residuals.  This will result in a relatively easy to interpret
+    #vector of residuals.  But this residual vector will NOT be a
+    #consistent set of ortho residuals.
+    residuals.rotate  <- matrix(nrow=obs,ncol=ncats)
+    for (ii in 1:ncats)
+      {
+        tindx  <- 1:ncats
+        tindx[1]  <- ii;
+        tindx[ii] <- 1;
+        
+        YTmp     <- Y[,c(tindx)]
+        YposTmp  <- Ypos[,c(tindx)]
+        XTmp     <- X[,,c(tindx)]
+        jacstackTmp  <- jacstack[,,c(tindx)]
+        tvec  <- as.matrix(mout$mtanh$coefficients[,c(tindx)])
+        
+        foo  <- permute(Y=YTmp, Ypos=YposTmp, X=XTmp,
+                        jacstack=jacstackTmp, tvec=tvec,
+                        pop=TotalY, sigma=sqrt(mout$mtanh$disp),
+                        weight=mout$mtanh$w)
+        
+        residuals.rotate[,ii]  <- foo$student[,1];
+      }  #end of ii loop
+    
     z  <- list(coefficients=mout$mtanh$coefficients,
                se=mout$mtanh$se,
                LQDsigma2=mout$mtanh$dispersion,
@@ -586,6 +610,7 @@ multinomRob <-
                weights=mout$weights,
                Hdiag=mout$Hdiag,
                prob=mout$mtanh$prob,
+               residuals.rotate=residuals.rotate,
                residuals.student=mout$cr$student,
                residuals.standard=mout$cr$standard,
                mnl=mnl1,
@@ -633,8 +658,8 @@ summary.multinomRob <- function(object, ..., digits=3, weights=FALSE)
       tmp <- as.data.frame(
                list("Est" = object$mtanh$coefficients[,i],
                     "SE Sand" = object$mtanh$se[,i],
-                    "SE OPG"  = object$mtanh$se.opg[,i],
-                    "SE Hess" = object$mtanh$se.hes[,i],
+#                    "SE OPG"  = object$mtanh$se.opg[,i],
+#                    "SE Hess" = object$mtanh$se.hes[,i],
                     "t-val Sand" = object$mtanh$coefficients[,i]/object$mtanh$se[,i]))
       tmp <- as.matrix(tmp);
       rn <- rep(blank, nx);
@@ -707,3 +732,31 @@ plot.multinomRob  <- function(x, ...)
     }
     #end if
   }#end of plot.multinomRob
+
+
+#Function to create ortho-residuals (with base correction) for the
+#other choices.  This will result in a relatively easy to interpret
+#vector of residuals.  But this residual vector will NOT be a
+#consistent set of ortho residuals.
+#
+#Modeled on
+#lapo:~/xchg/election/R/multinomial/FL2/base4.permute4.origtanh2.R
+#permute.newtanh4.R
+#
+permute  <- function(Y, Ypos, Xarray, jacstack, tvec, pop, sigma, weight)
+  {
+#tvec: tanh estimated values    
+    #from multinomTanh
+    nobs  <- dim(Y)[1]
+    ncats <- dim(Y)[2]
+    Hdiag <- robustified.leverage(tvec, Y, Ypos, Xarray, pop, ifelse(weight >0,1,0),jacstack);
+    w.Hdiag <- as.data.frame(matrix(c(as.vector(1:nobs),
+                                     signif(weight), signif(Hdiag)),ncol=(ncats-1)+(ncats-1)+1));
+#    names(w.Hdiag) <-
+#      c("name",paste("weights:",choice.labels[1:ncats-1],sep=""),
+#        paste("Hdiag:",choice.labels[1:ncats-1],sep=""));
+    #cat("mtanh: weights, Hdiag (by choices)\n");
+
+    cr <- fn.region.results(tvec, Y, Ypos, Xarray, pop, sigma, Hdiag);    
+    return(list(pred=cr$pred, student=cr$student, standard=cr$standard, Hdiag=Hdiag))
+  } #end of permute

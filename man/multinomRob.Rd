@@ -10,7 +10,7 @@
 }
 \usage{
   multinomRob(model, data, starting.values=NULL,  equality=NULL,
-              genoud.parms=NULL, print.level=0, iter = TRUE,
+              genoud.parms=NULL, print.level=0, iter = FALSE,
               maxiter = 10, multinom.t=1, multinom.t.df=NA)
 }
 \arguments{
@@ -108,7 +108,7 @@
     either the algorithm converges, the number of iterations specified by the
     \code{maxiter} argument is reached, or if an LQD step occurs that
     produces a larger value than the previous step did for the overdispersion
-    scale parameter.}
+    scale parameter.  This option is often improves the fit of the model.}
   \item{maxiter}{
     The maximum number of iterations to be done between LQD and tanh
     estimation steps.}
@@ -220,6 +220,12 @@
    \item{prob}{
      The matrix of predicted probabilities for each category for each
      observation based on the tanh coefficient estimates.}
+   \item{residuals.rotate}{
+     Matrix of studentized residuals which have been made comparable by
+     rotating each choice category to the first position.  These
+     residuals, unlike the student and standard residuals below, are no
+     longer orthogonalized because of the rotation.  These are the
+     residuals displayed in Table 6 of the reference article.}
    \item{residuals.student}{
      Matrix of fully studentized orthogonalized residuals.}
    \item{residuals.standard}{
@@ -248,7 +254,7 @@
   \url{http://macht.arts.cornell.edu/wrm1/multinom.pdf}
 
   For the most current code and related material see
-  \url{http://jsekhon.fas.harvard.edu/robest/}
+  \url{http://jsekhon.fas.harvard.edu/robust/}
 }
 \author{Walter R. Mebane, Jr., Cornell University,
   \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr
@@ -293,7 +299,7 @@ mulrobE <- multinomRob(list(y1 ~ x1, y2 ~ x2, y3 ~ 0),
                       dtf,
                       equality = list(list(y1 ~ x1 + 0, y2 ~ x2 + 0)),
                       genoud.parms = zz.genoud.parms,
-                      print.level = 3);
+                      print.level = 3, iter=TRUE);
 summary(mulrobE, weights=TRUE);
 }
 \keyword{robust}

@@ -118,6 +118,8 @@
     observation based on the coefficient estimates.}
   \item{jacstack}{
     The same \code{jacstack} that was supplied as an input argument.}
+  \item{Xarray}{
+    The same \code{Xarray} that was supplied as an input argument.}  
 }
 \references{
   Walter R. Mebane, Jr. and  Jasjeet Singh Sekhon. 2004.  ``Robust Estimation
@@ -126,7 +128,7 @@
   \url{http://macht.arts.cornell.edu/wrm1/multinom.pdf}
 
   For the most current code and related material see
-  \url{http://jsekhon.fas.harvard.edu/robest/}
+  \url{http://jsekhon.fas.harvard.edu/robust/}
 }
 \author{Walter R. Mebane, Jr., Cornell University,
   \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr

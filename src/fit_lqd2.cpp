@@ -437,8 +437,8 @@ double lqd2(double **SresRaw, long nobs, long nvars_unique, long ncats)
 
     if (!R_finite(fit_lqd2))
       {
-	printf("XXX\n");
-	fit_lqd2 = 999991234;
+	  /* printf("XXX\n"); */
+	  fit_lqd2 = 999991234;
       }
 
     //free memory

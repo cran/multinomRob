@@ -380,7 +380,7 @@ mGNtanh <- function(bstart, sigma2, resstart,
               iters=iters, error=error,
               GNlist=GNlist, tanhsigma2=tanhsigma2,
               Y=Y, Ypos=Ypos, probmat=probfunc(Y, Ypos, Xarray, GNlist$tvec),
-              jacstack=jacstack)
+              jacstack=jacstack, Xarray=Xarray)
          )
 }
 

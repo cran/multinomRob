@@ -123,7 +123,7 @@
   \url{http://macht.arts.cornell.edu/wrm1/multinom.pdf}
 
   For the most current code and related material see
-  \url{http://jsekhon.fas.harvard.edu/robest/}
+  \url{http://jsekhon.fas.harvard.edu/robust/}
 }
 \author{Walter R. Mebane, Jr., Cornell University,
   \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr
