@@ -1,0 +1,5 @@
+import(MASS, mvtnorm)
+useDynLib(multinomRob)
+export(multinomRob, multinomMLE, multinomTanh, multinomT, mGNtanh, rmultinomial)
+S3method(summary, multinomRob)
+S3method(plot, multinomRob)
