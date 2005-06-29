@@ -1,15 +1,10 @@
-Multinomial Regression Tanh Estimator Gauss-Newton Optimization
-                        Multinomial Regression Hyperbolic Tangenet
+mGNtanh                 Multinomial Regression Hyperbolic Tangenet
                         (Tanh) Estimator Gauss-Newton Optimization
-Multinomial Regression
-                        Multinomial Regression Maximum Likelihood
+multinomMLE             Multinomial Regression Maximum Likelihood
                         Estimator with Overdispersion
-Robust Multinomial Regression
-                        Multinomial Robust Estimation
-Multinomial Regression Tanh Estimator
-                        Multinomial Regression Hyperbolic Tangent
+multinomRob             Multinomial Robust Estimation
+multinomT               Multinomial Multivariate-T Estimation
+multinomTanh            Multinomial Regression Hyperbolic Tangent
                         (Tanh) Estimator
-Multinomial Multivariate-T Regression
-                        Multinomial Multivariate-T Estimation
 rmultinomial            Random Number Generator for the Multinomial
                         Distribution

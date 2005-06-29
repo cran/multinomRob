@@ -11,7 +11,7 @@
 #  http://jsekhon.fas.harvard.edu/
 #  jsekhon@fas.harvard.edu
 #
-#  $Id: multinomT.R,v 1.6 2004/02/19 02:13:11 wrm1 Exp $
+#  $Id: multinomT.R,v 1.7 2005/06/13 06:37:02 wrm1 Exp $
 #
 #
 
@@ -232,8 +232,15 @@ mt.dev  <- function (param, Xarray, xvec, jacstack, y, stack.index, nvars, freq,
 #    print(as.matrix(beta));
     tvec <- mnl.xvec.mapping(forward=FALSE, xvec, xvec, beta, d+1, nvars);
     ylinpred <- y;
-    for (j in 1:d) {
-      ylinpred[,j] <- Xarray[,,j] %*% tvec[,j];
+    if (dim(tvec)[1] == 1) {
+      for (j in 1:d) {
+        ylinpred[,j] <- Xarray[,,j] * tvec[,j];
+      }
+    }
+    else {
+      for (j in 1:d) {
+        ylinpred[,j] <- Xarray[,,j] %*% tvec[,j];
+      }
     }
     u <- y - ylinpred ;
 #    cat("u:\n")
@@ -279,8 +286,15 @@ mt.dev.grad  <- function (param, Xarray, xvec, jacstack, y, stack.index, nvars, 
     Oinv <- tA %*% Diag(D) %*% A
     tvec <- mnl.xvec.mapping(forward=FALSE, xvec, xvec, beta, d+1, nvars);
     ylinpred <- y;
-    for (j in 1:d) {
-      ylinpred[,j] <- Xarray[,,j] %*% tvec[,j];
+    if (dim(tvec)[1] == 1) {
+      for (j in 1:d) {
+        ylinpred[,j] <- Xarray[,,j] * tvec[,j];
+      }
+    }
+    else {
+      for (j in 1:d) {
+        ylinpred[,j] <- Xarray[,,j] %*% tvec[,j];
+      }
     }
     u <- y - ylinpred ;
     Q <- as.vector(apply((u %*% Oinv) * u, 1, sum))

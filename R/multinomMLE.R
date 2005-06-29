@@ -11,7 +11,7 @@
 #  http://jsekhon.fas.harvard.edu/
 #  jsekhon@fas.harvard.edu
 #
-#  $Id: multinomMLE.R,v 1.8 2004/02/19 02:13:11 wrm1 Exp $
+#  $Id: multinomMLE.R,v 1.9 2005/06/13 06:37:02 wrm1 Exp $
 #
 ## multinomMLE:  maximum likelihood estimator for grouped multinomial GLM, with overdispersion
 ##   Y:  matrix of (overdispersed and contaminated) multinomial counts
@@ -49,7 +49,12 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
       eta <- matrix(0,nobs,ncats)
       for (j in 1:ncats) {
         useobs <- Ypos[,j];
-        eta[useobs,j] <- exp(Xarray[useobs,,j] %*% tvec[,j]);
+        if (dim(tvec)[1] == 1) {
+          eta[useobs,j] <- exp(Xarray[useobs,,j] * tvec[,j]);
+        }
+        else {
+          eta[useobs,j] <- exp(Xarray[useobs,,j] %*% tvec[,j]);
+        }
       }
       return( c(1/(eta %*% rep(1,ncats))) * eta )
     }
@@ -59,7 +64,14 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
       scoremat <- matrix(0,nparms,nobs);
       for (i in 1:nobs) {
         usecats <- Ypos[i,];
-        scoremat[,i] <- N[i] * presmat[i,usecats] %*% t(jacstack[i,,usecats]) ;  ## unweighted
+        if (dim(jacstack)[2]==1) {
+          scoremat[,i] <- 
+            N[i] * presmat[i,usecats] %*% jacstack[i,,usecats] ;  ## unweighted
+        }
+        else {
+          scoremat[,i] <- 
+            N[i] * presmat[i,usecats] %*% t(jacstack[i,,usecats]) ;  ## unweighted
+        }
       }
       return( scoremat )
     }
@@ -72,7 +84,12 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
         pvec <- phat[i,usecats];
         wpvmat <- diag(pvec)-outer(pvec,pvec);  ## unweighted
         H0 <- N[i] * wpvmat;
-        H <- H + jacstack[i,,usecats] %*% H0 %*% t(jacstack[i,,usecats])
+        if (dim(jacstack)[2]==1) {
+          H <- H + jacstack[i,,usecats] %*% H0 %*% jacstack[i,,usecats]
+        }
+        else {
+          H <- H + jacstack[i,,usecats] %*% H0 %*% t(jacstack[i,,usecats])
+        }
       }
       return( H )
     }

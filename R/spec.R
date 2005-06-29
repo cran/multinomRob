@@ -11,7 +11,7 @@
 #  http://jsekhon.fas.harvard.edu/
 #  jsekhon@fas.harvard.edu
 #
-#  $Id: spec.R,v 1.4 2004/02/14 22:21:35 wrm1 Exp $
+#  $Id: spec.R,v 1.5 2005/06/13 06:37:02 wrm1 Exp $
 #
 
 # functions to interpret model formula specifications and build data to analyze
@@ -87,10 +87,14 @@ get.xy <- function(formlist, datafr, print.level=0) {
     ypos[,i] <- datafr[[ ynames[i] ]] >= 0;
     ypos[,i] <- ifelse(is.na(ypos[,i]), TRUE, ypos[,i]);
     ymiss[,i] <- is.na(datafr[[ ynames[i] ]]);
-    xni <- as.character(attr(ti, "term.labels")) ;
-    if (length(xni) >= 1) {
-      for (ii in 1:length(xni)) {
-        xmiss[,i] <- xmiss[,i] | is.na(datafr[[ xni[ii] ]]);
+    if (length(attr(ti, "term.labels")) > 0)  {
+      xni <- as.character(attr(ti, "term.labels")) ;
+      if (length(xni) >= 1) {
+        for (ii in 1:length(xni)) {
+          if (xni[ii] %in% names(datafr)) {  # skip interaction terms
+            xmiss[,i] <- xmiss[,i] | is.na(datafr[[ xni[ii] ]]);
+          }
+        }
       }
     }
   }

@@ -11,7 +11,7 @@
 #  http://jsekhon.fas.harvard.edu/
 #  jsekhon@fas.harvard.edu
 #
-#  $Id: multinomRob.R,v 1.12 2004/02/19 02:13:11 wrm1 Exp $
+#  $Id: multinomRob.R,v 1.14 2005/06/13 06:37:02 wrm1 Exp $
 
 
 ######################################################
@@ -583,25 +583,27 @@ multinomRob <-
     #vector of residuals.  But this residual vector will NOT be a
     #consistent set of ortho residuals.
     residuals.rotate  <- matrix(nrow=obs,ncol=ncats)
-    for (ii in 1:ncats)
-      {
-        tindx  <- 1:ncats
-        tindx[1]  <- ii;
-        tindx[ii] <- 1;
-        
-        YTmp     <- Y[,c(tindx)]
-        YposTmp  <- Ypos[,c(tindx)]
-        XTmp     <- X[,,c(tindx)]
-        jacstackTmp  <- jacstack[,,c(tindx)]
-        tvec  <- as.matrix(mout$mtanh$coefficients[,c(tindx)])
-        
-        foo  <- permute(Y=YTmp, Ypos=YposTmp, X=XTmp,
-                        jacstack=jacstackTmp, tvec=tvec,
-                        pop=TotalY, sigma=sqrt(mout$mtanh$disp),
-                        weight=mout$mtanh$w)
-        
-        residuals.rotate[,ii]  <- foo$student[,1];
-      }  #end of ii loop
+    if (mout$mtanh$error < 32) {
+      for (ii in 1:ncats)
+        {
+          tindx  <- 1:ncats
+          tindx[1]  <- ii;
+          tindx[ii] <- 1;
+          
+          YTmp     <- Y[,c(tindx)]
+          YposTmp  <- Ypos[,c(tindx)]
+          XTmp     <- X[,,c(tindx), drop=FALSE];
+          jacstackTmp  <- jacstack[,,c(tindx), drop=FALSE]
+          tvec  <- as.matrix(mout$mtanh$coefficients[,c(tindx), drop=FALSE])
+          
+          foo  <- permute(Y=YTmp, Ypos=YposTmp, X=XTmp,
+                          jacstack=jacstackTmp, tvec=tvec,
+                          pop=TotalY, sigma=sqrt(mout$mtanh$disp),
+                          weight=mout$mtanh$w)
+          
+          residuals.rotate[,ii]  <- foo$student[,1];
+        }  #end of ii loop
+    }
     
     z  <- list(coefficients=mout$mtanh$coefficients,
                se=mout$mtanh$se,

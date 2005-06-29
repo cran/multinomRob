@@ -1,4 +1,4 @@
-% $Id: multinomRob.Rd,v 1.10 2004/02/19 02:13:11 wrm1 Exp $
+% $Id: multinomRob.Rd,v 1.11 2004/04/12 02:59:16 wrm1 Exp $
 %
 \name{Robust Multinomial Regression}
 \alias{multinomRob}

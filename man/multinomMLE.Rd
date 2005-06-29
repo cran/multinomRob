@@ -1,4 +1,4 @@
-% $Id: multinomMLE.Rd,v 1.9 2004/02/18 07:07:40 wrm1 Exp $
+% $Id: multinomMLE.Rd,v 1.10 2004/04/12 02:59:16 wrm1 Exp $
 %
 \name{Multinomial Regression}
 \alias{multinomMLE}

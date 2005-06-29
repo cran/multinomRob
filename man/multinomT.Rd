@@ -1,4 +1,4 @@
-% $Id: multinomT.Rd,v 1.4 2004/02/18 07:07:40 wrm1 Exp $
+% $Id: multinomT.Rd,v 1.5 2004/04/12 02:59:16 wrm1 Exp $
 %
 \name{Multinomial Multivariate-T Regression}
 \alias{multinomT}

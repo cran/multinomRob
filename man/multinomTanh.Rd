@@ -1,4 +1,4 @@
-% $Id: multinomTanh.Rd,v 1.6 2004/02/18 07:07:40 wrm1 Exp $
+% $Id: multinomTanh.Rd,v 1.7 2004/04/12 02:59:16 wrm1 Exp $
 %
 \name{Multinomial Regression Tanh Estimator}
 \alias{multinomTanh}

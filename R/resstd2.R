@@ -11,7 +11,7 @@
 #  http://jsekhon.fas.harvard.edu/
 #  jsekhon@fas.harvard.edu
 #
-#  $Id: resstd2.R,v 1.5 2004/03/04 02:08:17 wrm1 Exp $
+#  $Id: resstd2.R,v 1.6 2005/06/13 06:37:02 wrm1 Exp $
 #
 
 # probfunc: matrix of estimated probabilities
@@ -21,7 +21,12 @@ mnl.probfunc <-  function(Y, Ypos, Xarray, tvec) {
   eta <- matrix(0,nobs,ncats)
   for (j in 1:ncats) {
     useobs <- Ypos[,j];
-    eta[useobs,j] <- exp(Xarray[useobs,,j] %*% tvec[,j]);
+    if (dim(tvec)[1] == 1) {
+      eta[useobs,j] <- exp(Xarray[useobs,,j] * tvec[,j]);
+    }
+    else {
+      eta[useobs,j] <- exp(Xarray[useobs,,j] %*% tvec[,j]);
+    }
   }
   return( c(1/(eta %*% rep(1,ncats))) * eta )
 }#end of mnl.probfunc

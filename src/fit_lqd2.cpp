@@ -5,7 +5,7 @@
   http://jsekhon.fas.harvard.edu/
   jsekhon@fas.harvard.edu
 
-  $Id: fit_lqd2.cpp,v 1.3 2004/02/14 06:28:13 wrm1 Exp $
+  $Id: fit_lqd2.cpp,v 1.4 2004/04/12 02:59:16 wrm1 Exp $
 
 */
 

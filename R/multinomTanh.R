@@ -11,7 +11,7 @@
 #  http://jsekhon.fas.harvard.edu/
 #  jsekhon@fas.harvard.edu
 #
-#  $Id: multinomTanh.R,v 1.10 2004/02/19 02:13:11 wrm1 Exp $
+#  $Id: multinomTanh.R,v 1.13 2005/06/13 06:37:02 wrm1 Exp $
 #
 #
 # mGNtanh, multinomTanh and robustified.leverage
@@ -88,7 +88,12 @@ mGNtanh <- function(bstart, sigma2, resstart,
       eta <- matrix(0,nobs,ncats)
       for (j in 1:ncats) {
         useobs <- Ypos[,j];
-        eta[useobs,j] <- exp(Xarray[useobs,,j] %*% tvec[,j]);
+        if (dim(tvec)[1] == 1) {
+          eta[useobs,j] <- exp(Xarray[useobs,,j] * tvec[,j]);
+        }
+        else {
+          eta[useobs,j] <- exp(Xarray[useobs,,j] %*% tvec[,j]);
+        }
       }
       return( c(1/(eta %*% rep(1,ncats))) * eta )
     }
@@ -103,8 +108,22 @@ mGNtanh <- function(bstart, sigma2, resstart,
         pci <- mcholeskyLinv(phat[i,usecats]) ;
         adj <- t(pci) %*% diag(c(wmat[i,1:(nlesscats-1)],1)) %*% t(pc)
         ##     adj <- t(pci) %*% diag(c(wmat[i,1:(nlesscats-1)],1))
-        scoremat[,i] <- N[i] * presmat[i,usecats] %*% adj %*% t(jacstack[i,,usecats]) ;  ## weighted
-        ##     scoremat[,i] <- N[i] * presmat[i,usecats] %*% t(jacstack[i,,usecats]) ;  ## unweighted
+        if (dim(jacstack)[2]==1) {
+          scoremat[,i] <- 
+            N[i] * presmat[i,usecats] %*% adj %*% jacstack[i,,usecats] ;  ## weighted
+        }
+        else {
+          scoremat[,i] <- 
+            N[i] * presmat[i,usecats] %*% adj %*% t(jacstack[i,,usecats]) ;  ## weighted
+        }
+        ## if (dim(jacstack)[2]==1) {
+        ##   scoremat[,i] <- 
+        ##     N[i] * presmat[i,usecats] %*% jacstack[i,,usecats] ;  ## unweighted
+        ## }
+        ## else {
+        ##   scoremat[,i] <- 
+        ##     N[i] * presmat[i,usecats] %*% t(jacstack[i,,usecats]) ;  ## unweighted
+        ## }
       }
       return( scoremat )
     }
@@ -121,7 +140,12 @@ mGNtanh <- function(bstart, sigma2, resstart,
         ##     wpvmat <- diag(pD * c(wmat[i,1:(nlesscats-1)],1)) ;  ## matrix-weighted varmat
         ##     wpvmat <- diag(phat[i,usecats])-outer(phat[i,usecats],phat[i,usecats]);  ## unweighted
         H0 <- N[i] * wpvmat;
-        H <- H + jacstack[i,,usecats] %*% H0 %*% t(jacstack[i,,usecats])
+        if (dim(jacstack)[2]==1) {
+          H <- H + jacstack[i,,usecats] %*% H0 %*% jacstack[i,,usecats]
+        }
+        else {
+          H <- H + jacstack[i,,usecats] %*% H0 %*% t(jacstack[i,,usecats])
+        }
       }
       return( H )
     }
@@ -138,7 +162,12 @@ mGNtanh <- function(bstart, sigma2, resstart,
         ##     wpvmat <- diag(pD * c(wmat[i,1:(nlesscats-1)]^2,1)) ;  ## matrix-weighted varmat
         ##     wpvmat <- diag(phat[i,usecats])-outer(phat[i,usecats],phat[i,usecats]);  ## unweighted
         H0 <- N[i] * wpvmat;
-        H <- H + jacstack[i,,usecats] %*% H0 %*% t(jacstack[i,,usecats])
+        if (dim(jacstack)[2]==1) {
+          H <- H + jacstack[i,,usecats] %*% H0 %*% jacstack[i,,usecats]
+        }
+        else {
+          H <- H + jacstack[i,,usecats] %*% H0 %*% t(jacstack[i,,usecats])
+        }
       }
       return( H / nobs)
     }
@@ -268,7 +297,13 @@ mGNtanh <- function(bstart, sigma2, resstart,
           scorefunc(Ypos, nobs, tvunique, ipmat, mvec, presmat, wmatGN, jacstack);
         hess2 <-
           hessianfunc2(Ypos, nobs, ncats, tvunique, ipmat, mvec, wmatGN, jacstack);
-        posdef <- all(eigen(hess2, symmetric=TRUE, only.values=TRUE)$values > 0);
+        ehess2 <- try(eigen(hess2, symmetric=TRUE, only.values=TRUE));
+        if (length(ehess2) == 1 || any(ehess2$val==0)) {  # error in eigen() or singular
+          posdef <- FALSE;
+        }
+        else {
+          posdef <- all(ehess2$values > 0);
+        }
         gradient <- (score %*% rep(1,nobs)) / sqrt(sigma2GN) / nobs ;
         if (!posdef) {
           convflag <- FALSE;
@@ -289,6 +324,10 @@ mGNtanh <- function(bstart, sigma2, resstart,
           plambda <- probfunc(Y, Ypos, Xarray, tlambda);
           logliklambda <- LogLik(Y,Ypos,wmatGN,plambda,mvec)$LL;
           if (!is.na(logliklambda) && logliklambda < loglik) break;
+        }
+        if (is.na(logliklambda) | is.na(loglik)) {
+          convflag <- FALSE;
+          break;
         }
         if (logliklambda < loglik) bvec <- blambda;
         tvec <- mnl.xvec.mapping(forward=FALSE,xvec,tvec,bvec, ncats,tvars.total);
@@ -313,11 +352,12 @@ mGNtanh <- function(bstart, sigma2, resstart,
       }
       information <-
         hessianfunc(Ypos, nobs, ncats, tvunique, ipmat, mvec, wmatGN, jacstack);
-      if (all(eigen(information, symmetric=TRUE, only.values=TRUE)$values > 0)) {
-        formation <- solve(information, tol=.Machine$double.eps, LINPACK=TRUE);
+      ehess2 <- try(eigen(information, symmetric=TRUE, only.values=TRUE));
+      if (length(ehess2) == 1 || any(ehess2$val==0)) {  # error in eigen() or singular hessian
+        formation <- NA;
       }
       else {
-        formation <- NA;
+        formation <- solve(information, tol=.Machine$double.eps, LINPACK=TRUE);
       }
       return(
              list(coefficients=bvec, tvec=tvec, formation=formation, score=score,
@@ -345,27 +385,38 @@ mGNtanh <- function(bstart, sigma2, resstart,
     wlist <- weights(Y,Ypos,Xarray,GNlist$tvec,sigma2,ncats);
     wmat <- wlist$w;
     wmatNA <- wlist$wNA;
-    if (converged(bvec,bprev) & converged(wmat,wprev)) break;
+    if (error>0 || converged(bvec,bprev) & converged(wmat,wprev)) break;
   }
 
   opg <- GNlist$score %*% t(GNlist$score) ;
   obsformation <- GNlist$formation ;
-  rcovmat <- obsformation %*% opg %*% obsformation;
+  badformation <- length(obsformation)==1 && is.na(obsformation);
+  if (badformation) {
+    rcovmat <- obsformation <- NA * opg;
+  }
+  else {
+    rcovmat <- obsformation %*% opg %*% obsformation;
+  }
 
   if (print.level > 1) {  
-    if (length(obsformation)==1 && obsformation==NA) {
+    if (badformation) {
       print(paste("mGNtanh: hessian determinant:",NA));
     }
     else {
       print(paste("mGNtanh: hessian determinant:",
         det(solve(obsformation, tol=.Machine$double.eps, LINPACK=TRUE))));
     }
-    print(paste("mGNtanh: OPG determinant:", det(opg)));
+    if (any(is.na(opg))) {
+      print(paste("mGNtanh: OPG determinant:", NA));
+    }
+    else {
+      print(paste("mGNtanh: OPG determinant:", det(opg)));
+    }
     print(paste("mGNtanh: tanh sigma^2:", tanhsigma2));
   }
 
 #  if (tanhsigma2 > sigma2) error <- error + 1;  ## error: tanh sigma2 > LQD sigma2
-  if (sum(wmat) < nobs*(ncats-1)/2) error <- error + 2;  ## error: wgts are too small
+  if (error<32 && sum(wmat) < nobs*(ncats-1)/2) error <- error + 2;  ## error: wgts are too small
 
   ## table of returned error values (indicated values add to give total error)
   ## 0    no errors
@@ -403,7 +454,7 @@ multinomTanh <- function (Y, Ypos, X, jacstack, xvec, tvec, pop, s2,
     mtanh <-
       mGNtanh(beta.vector, s2, residuals$Sres,
                Y, Ypos, X, xvec, as.matrix(tvec),
-               jacstack,print.level);
+               jacstack,print.level=print.level);
 
     tvec <- mnl.xvec.mapping(forward=FALSE,xvec,tvec,mtanh$coeffvec,
                              ncats,nvars);
@@ -413,12 +464,22 @@ multinomTanh <- function (Y, Ypos, X, jacstack, xvec, tvec, pop, s2,
     se  <- as.data.frame(mnl.xvec.mapping(forward=FALSE,xvec,se,se.vec,
                                           ncats,nvars));
 
-    se.opg.vec  <- sqrt(diag(ginv(mtanh$A)));
+    if (any(is.na(mtanh$A))) {
+      se.opg.vec  <- rep(NA, dim(mtanh$A)[1]);
+    }
+    else {
+      se.opg.vec  <- sqrt(diag(ginv(mtanh$A)));
+    }
     se.opg  <- xvec;
     se.opg  <- as.data.frame(mnl.xvec.mapping(forward=FALSE,xvec,se.opg,se.opg.vec,
                                               ncats,nvars));
 
-    se.hes.vec <- sqrt(diag(mtanh$B));
+    if (any(is.na(mtanh$B))) {
+      se.hes.vec  <- rep(NA, dim(mtanh$B)[1]);
+    }
+    else {
+      se.hes.vec <- sqrt(diag(mtanh$B));
+    }
     se.hes  <- xvec;
     se.hes  <- as.data.frame(mnl.xvec.mapping(forward=FALSE,xvec,se.hes,se.hes.vec,
                                               ncats,nvars));        
@@ -435,13 +496,18 @@ multinomTanh <- function (Y, Ypos, X, jacstack, xvec, tvec, pop, s2,
     names(se.hes)     <- choice.labels;
     mtanh$se.hes      <- se.hes;
 
-    Hdiag <- robustified.leverage(tvec, Y, Ypos, X, pop, ifelse(mtanh$w>0,1,0),jacstack);
-    w.Hdiag <- as.data.frame(matrix(c(as.vector(1:nobs),
-                                     signif(mtanh$w), signif(Hdiag)),ncol=(ncats-1)+(ncats-1)+1));
-    names(w.Hdiag) <-
-      c("name",paste("weights:",choice.labels[1:ncats-1],sep=""),
-        paste("Hdiag:",choice.labels[1:ncats-1],sep=""));
-    #cat("mtanh: weights, Hdiag (by choices)\n");
+    if (any(is.na(mtanh$w)) || any(is.na(jacstack))) {
+      w.Hdiag <- Hdiag <- NA;
+    }
+    else {
+      Hdiag <- robustified.leverage(tvec, Y, Ypos, X, pop, ifelse(mtanh$w>0,1,0),jacstack);
+      w.Hdiag <- as.data.frame(matrix(c(as.vector(1:nobs),
+                                 signif(mtanh$w), signif(Hdiag)),ncol=(ncats-1)+(ncats-1)+1));
+      names(w.Hdiag) <-
+        c("name",paste("weights:",choice.labels[1:ncats-1],sep=""),
+          paste("Hdiag:",choice.labels[1:ncats-1],sep=""));
+      #cat("mtanh: weights, Hdiag (by choices)\n");
+    }
 
     sigma2 <- mtanh$disp;
     sigma  <- sqrt(sigma2);    
@@ -449,15 +515,21 @@ multinomTanh <- function (Y, Ypos, X, jacstack, xvec, tvec, pop, s2,
     cr <- fn.region.results(tvec, Y, Ypos, X, pop, sigma, Hdiag);
 
     mtanh$coef <- tvec;
-    weights <- w.Hdiag[,c(1:ncats)];
-    j  <- ncats
-    Hdiag   <- w.Hdiag[,c(1,(j+1):(j+j-1))];
+    if (any(is.na(w.Hdiag))) {
+      weights <- NA;
+    }
+    else {
+      weights <- w.Hdiag[,c(1:ncats)];
+      j  <- ncats
+      Hdiag   <- w.Hdiag[,c(1,(j+1):(j+j-1))];
+    }
 
     return( list(mtanh= mtanh,
                  weights=weights,
                  Hdiag=Hdiag,
                  cr   = cr,
-                 tvec =tvec));
+                 tvec =tvec,
+                 residuals= residual.generator(tvec,Y,Ypos,X,pop) ) );
   } #multinomTanh
 
 
@@ -544,8 +616,14 @@ robustified.leverage <- function (tvec, Y, Ypos, Xarray, m, Win,jacstack) {
         C0  <- smp %*% t(L) %*% V %*% diag(W[i,]) %*% V %*% t(L) %*% t(smp);
       }
       else {
-        C0  <- jacstack[i,,] %*% t(L) %*% V %*% diag(W[i,]) %*%
-                 V %*% t(L) %*% t(jacstack[i,,]);
+        if (dim(jacstack)[2]==1) {
+          C0  <- jacstack[i,,] %*% t(L) %*% V %*% diag(W[i,]) %*%
+                  V %*% t(L) %*% jacstack[i,,];
+        }
+        else {
+          C0  <- jacstack[i,,] %*% t(L) %*% V %*% diag(W[i,]) %*%
+                   V %*% t(L) %*% t(jacstack[i,,]);
+        }
       }
       Center  <- Center + C0;
     } #end of i
@@ -568,9 +646,16 @@ robustified.leverage <- function (tvec, Y, Ypos, Xarray, m, Win,jacstack) {
                         invCenter %*% smp %*% t(L) %*% V)[1:(ncats-1)];
       }
       else {
-        Hdiag[i,]  <-
-          diag(V %*% t(L) %*% t(jacstack[i,,]) %*%
-            invCenter %*% jacstack[i,,] %*% t(L) %*% V)[1:(ncats-1)];
+        if (dim(jacstack)[2]==1) {
+          Hdiag[i,]  <-
+            diag(V %*% t(L) %*% jacstack[i,,] %*%
+              invCenter %*% jacstack[i,,] %*% t(L) %*% V)[1:(ncats-1)];
+        }
+        else {
+          Hdiag[i,]  <-
+            diag(V %*% t(L) %*% t(jacstack[i,,]) %*%
+              invCenter %*% jacstack[i,,] %*% t(L) %*% V)[1:(ncats-1)];
+        }
       }
     } #end of i
   
