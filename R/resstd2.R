@@ -7,11 +7,11 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: resstd2.R,v 1.6 2005/06/13 06:37:02 wrm1 Exp $
+#  $Id: resstd2.R,v 1.8 2005/09/27 08:04:06 wrm1 Exp $
 #
 
 # probfunc: matrix of estimated probabilities
@@ -108,18 +108,6 @@ res.std <- function(y,m,p, print.level=0)
       print(d); 
     }
     return(Sr);
-  }
-
-ResStd  <- function(nobs, ncats, nvars.total, nvars.unique,
-                    tvec, Y, X, weights)
-  {
-    SresRaw  <- matrix(0,nrow=obs,ncol=(ncats-1));
-    SresRaw  <- .Call("InResStd", as.integer(nobs),  as.integer(ncats),
-                      as.integer(nvars.total), as.integer(nvars.unique),
-                      as.real(tvec), as.real(Y), as.real(X),
-                      as.real(weights), as.real(SresRaw),
-                      PACKAGE="multinomRob");
-    return(SresRaw);
   }
 
 kth.smallest  <- function(SortVector, obs, k)

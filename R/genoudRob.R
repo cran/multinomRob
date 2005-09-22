@@ -7,11 +7,11 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: genoudRob.R,v 1.4 2004/03/04 02:08:17 wrm1 Exp $
+#  $Id: genoudRob.R,v 1.6 2005/09/27 08:04:06 wrm1 Exp $
 #
 ###################################
 #New Front End for Genoud, with tuned defaults
@@ -21,6 +21,20 @@
 genoudParms  <- function(genoud.parms)
   {
     #set user controlled defaults
+    if (!is.null(genoud.parms$cluster)) {
+      if (length(genoud.parms$cluster) > 1) {
+        warning("cluster option cannot be used with 'multinomRob'")
+      } else if (is.list(genoud.parms$cluster)) {
+        warning("cluster option cannot be used with 'multinomRob'")
+      } else if (genoud.parms$cluster!=FALSE) {
+        warning("cluster option cannot be used with 'multinomRob'")
+      }
+    }
+    genoud.parms$cluster  <- FALSE;
+
+    if (is.null(genoud.parms$balance))
+      genoud.parms$balance  <- FALSE  ;
+    
     if (is.null(genoud.parms$pop.size))
       genoud.parms$pop.size  <- 1000;
 
@@ -35,7 +49,7 @@ genoudParms  <- function(genoud.parms)
 
     #this is redundant, but maintains clarity  
     if (is.null(genoud.parms$MemoryMatrix))
-      genoud.parms$MemoryMatrix  <- NULL;
+      genoud.parms$MemoryMatrix  <- TRUE;
   
     if (is.null(genoud.parms$Debug))
       genoud.parms$Debug  <- FALSE ;
@@ -113,12 +127,16 @@ genoudParms  <- function(genoud.parms)
 
 genoudRob <- function(fn,nvars,starting.values,genoud.parms)
 {
+  #new options for genoud > 2.0 which are needed
+  lexical=FALSE
+  cluster  <- genoud.parms$cluster
+  balance  <- genoud.parms$balance
+  
   #set static defaults
   max  <- FALSE
   gradient.check  <- FALSE
   data.type.int  <- FALSE
   hessian  <- FALSE  
-  roptim <- TRUE;
 
   #load up genoud.parms
   pop.size  <- genoud.parms$pop.size;
@@ -150,123 +168,25 @@ genoudRob <- function(fn,nvars,starting.values,genoud.parms)
   P8  <- genoud.parms$P8;
   P9  <- genoud.parms$P9;
 
-  #we always have starting, but leave this check in. 
-  #do we have starting values?
-  if (is.null(starting.values)) {
-    nStartingValues <- 0;
-    parm.vec  <- rep(1,nvars)
-  }
-  else {
-    nStartingValues <- 1;
-    parm.vec  <- starting.values;
-  }
-
-  # let's create the Domains if none have been passed.
   if (!(is.matrix(Domains)))
     {
       Domains <- matrix(nrow=nvars, ncol=2);
       for (i in 1:nvars)
         {
-          Domains[i,1] <- parm.vec[i] - abs(parm.vec[i])*scale.domains;
-          Domains[i,2] <- parm.vec[i] + abs(parm.vec[i])*scale.domains;
+          Domains[i,1] <- starting.values[i] - abs(starting.values[i])*scale.domains;
+          Domains[i,2] <- starting.values[i] + abs(starting.values[i])*scale.domains;
         } # end of for loop
     } # end of Domains if
-  
-  #MemoryMatrix
-  if (is.null(MemoryMatrix)) {
-    MemoryMatrix <- TRUE;
 
-    if (nvars > 20) {
-      if (print.level > 0) {
-        cat("\nWARNING: Since the number of parameters is greater than 20,\nWARNING: MemoryMatrix has been turned off by default.\nWARNING: You may turn it on using the MemoryMatrix flag.\nWARNING: This option increases speed at the cost of extra memory usage.\n\n")
-        MemoryMatrix <- FALSE;
-      }
-    }
-  }
+  ret = genoud(fn, nvars=nvars, max=max, pop.size=pop.size, max.generations=max.generations, wait.generations=wait.generations,
+               hard.generation.limit=hard.generation.limit, starting.values=starting.values, MemoryMatrix=MemoryMatrix, 
+               Domains=Domains, solution.tolerance=solution.tolerance,
+               gr=NULL, boundary.enforcement=boundary.enforcement, lexical=lexical, gradient.check=gradient.check, BFGS=BFGS, 
+               data.type.int=data.type.int, hessian=hessian, unif.seed=unif.seed, int.seed=int.seed,
+               print.level=print.level, share.type=share.type, instance.number=instance.number,
+               output.path=output.path, output.append=output.append, project.path=project.path,
+               P1=P1, P2=P2, P3=P3, P4=P4, P5=P5, P6=P6, P7=P7, P8=P8, P9=P9,
+               cluster=cluster, balance=balance, debug=Debug)
 
-  #set output.type
-  if (output.path=="stdout")
-    {
-      output.type <- 0;
-    }
-  else
-    {
-      if (output.append)
-        {
-          output.type <- 2;
-        }
-      else
-        {
-          output.type <- 1;
-        }
-    }
-
-  # create the P vector
-  P <- vector(length=9, mode="numeric");
-  P[1] <- P1; P[2] <- P2; P[3] <- P3; P[4] <- P4;
-  P[5] <- P5; P[6] <- P6; P[7] <- P7; P[8] <- P8;
-  P[9] <- P9;
-
-  # has the user provided any seeds?
-  if (unif.seed==812821 && int.seed==53058)
-    provide.seeds <- FALSE
-  else
-    provide.seeds <- TRUE;
-
-  if (max==FALSE)
-        {
-          g.scale <- 1;
-        }
-  else
-    {
-      g.scale <- -1;
-    }
-
-  #optim st
-  genoud.optim.wrapper101 <- function(foo.vals)
-    {
-      ret <- optim(foo.vals, fn=as.function(fn), method="BFGS",
-                  control=list(fnscale=g.scale));
-      return(c(ret$value,ret$par));
-    } # end of genoud.optim.wrapper101
-
-
-  gout <- .Call("rgenoud", as.function(fn), new.env(),
-                as.integer(nvars), as.integer(pop.size), as.integer(max.generations),
-                as.integer(wait.generations),
-                as.integer(nStartingValues), as.vector(starting.values),
-                as.vector(P), as.matrix(Domains),
-                as.integer(max), as.integer(gradient.check), as.integer(boundary.enforcement),
-                as.double(solution.tolerance), as.integer(BFGS), as.integer(data.type.int),
-                as.integer(provide.seeds), as.integer(unif.seed), as.integer(int.seed),
-                as.integer(print.level), as.integer(share.type), as.integer(instance.number),
-                as.integer(MemoryMatrix), as.integer(Debug),
-                as.character(output.path), as.integer(output.type), as.character(project.path),
-                as.integer(hard.generation.limit),
-                as.function(genoud.optim.wrapper101), as.integer(roptim),
-                PACKAGE="rgenoud");
-
-  if (hessian==TRUE)
-    {
-      hes <- optim(gout[5:(nvars+4)], fn, method="BFGS", hessian=TRUE,
-                  control=list(fnscale=g.scale));
-      
-      hes <- hes$hessian;
-
-      ret <- list(value=gout[1], generations=gout[2], peakgeneration=gout[3], popsize=gout[4],
-                 par=gout[5:(nvars+4)], gradients=gout[(nvars+5):(nvars+nvars+4)],
-                 operators=gout[(nvars+nvars+5):(nvars+nvars+9+4)],
-                 hessian=hes);
-    }
-  else
-    {
-      ret <- list(value=gout[1], generations=gout[2], peakgeneration=gout[3], popsize=gout[4],
-                 par=gout[5:(nvars+4)], gradients=gout[(nvars+5):(nvars+nvars+4)],
-                 operators=gout[(nvars+nvars+5):(nvars+nvars+9+4)]);
-    }
-
-  return(ret);
+  return(ret)
 } #end of genoudRob()
-
-
-    

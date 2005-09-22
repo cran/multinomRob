@@ -7,11 +7,11 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: multinomRob.R,v 1.14 2005/06/13 06:37:02 wrm1 Exp $
+#  $Id: multinomRob.R,v 1.16 2005/09/27 08:04:06 wrm1 Exp $
 
 
 ######################################################
@@ -183,7 +183,7 @@ multinomRob <-
     TotalY <- apply( Y, 1, sum)
     tvec  <- xvec;
     nvars.unique <- sum(xvec == 1) + length(unique(xvec[xvec>1]));
-    nvars.total  <- nvars
+#    nvars.total  <- nvars
 
     ## ------------------- END: PARSING / MODEL BUILDING AUTOMATION ------------------
 
@@ -710,7 +710,7 @@ plot.multinomRob  <- function(x, ...)
       return(NULL)
     } 
 
-    out.mtanh <- list()
+#    out.mtanh <- list()
 
     if (!is.null(x$mtanh) && is.list(x$mtanh) && x$mtanh$error == 0)
       {
@@ -752,8 +752,8 @@ permute  <- function(Y, Ypos, Xarray, jacstack, tvec, pop, sigma, weight)
     nobs  <- dim(Y)[1]
     ncats <- dim(Y)[2]
     Hdiag <- robustified.leverage(tvec, Y, Ypos, Xarray, pop, ifelse(weight >0,1,0),jacstack);
-    w.Hdiag <- as.data.frame(matrix(c(as.vector(1:nobs),
-                                     signif(weight), signif(Hdiag)),ncol=(ncats-1)+(ncats-1)+1));
+#    w.Hdiag <- as.data.frame(matrix(c(as.vector(1:nobs),
+#                                     signif(weight), signif(Hdiag)),ncol=(ncats-1)+(ncats-1)+1));
 #    names(w.Hdiag) <-
 #      c("name",paste("weights:",choice.labels[1:ncats-1],sep=""),
 #        paste("Hdiag:",choice.labels[1:ncats-1],sep=""));

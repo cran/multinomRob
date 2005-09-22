@@ -7,11 +7,11 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: multinomLQD.R,v 1.2 2004/03/04 02:08:17 wrm1 Exp $
+#  $Id: multinomLQD.R,v 1.3 2005/09/23 03:12:42 wrm1 Exp $
 #
 
 ##

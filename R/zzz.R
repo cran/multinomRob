@@ -7,21 +7,21 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: zzz.R,v 1.5 2004/02/19 02:13:11 wrm1 Exp $
+#  $Id: zzz.R,v 1.7 2005/09/27 08:04:06 wrm1 Exp $
 #
 
 # use .onLoad instead of .First.lib for use with NAMESPACE and R(>= 1.7.0)
 .onLoad <- function(lib, pkg) {
   library.dynam(pkg, pkg, lib)
-  require(rgenoud)||
+  require("rgenoud")||
     cat("ERROR: library 'rgenoud' is needed by 'multinomRob' and is missing\n")
-  require(MASS)   ||
+  require("MASS")   ||
     cat("ERROR: library 'MASS' is needed by 'multinomRob' and is missing\n")  
-  require(mvtnorm)||
+  require("mvtnorm")||
     cat("ERROR: library 'mvtnorm' is needed by 'multinomRob' and is missing\n")
 }#end of .First
 

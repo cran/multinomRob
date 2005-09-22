@@ -1,4 +1,4 @@
-% $Id: rmultinomial.Rd,v 1.3 2004/02/18 07:07:40 wrm1 Exp $
+% $Id: rmultinomial.Rd,v 1.4 2005/09/23 03:12:42 wrm1 Exp $
 %
 \name{rmultinomial}
 \alias{rmultinomial}
@@ -25,8 +25,8 @@ rmultinomial(n = 5, pr = c(0.5, 0.5), long = FALSE)
 \author{Walter R. Mebane, Jr., Cornell University,
   \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr
 
-  Jasjeet S. Sekhon, Harvard University, \email{jasjeet\_sekhon@harvard.edu},
-  \url{http://jsekhon.fas.harvard.edu/}
+  Jasjeet S. Sekhon, UC Berkeley, \email{sekhon@berkeley.edu},
+  \url{http://sekhon.polisci.berkeley.edu/}}
 }
 \note{
   This function is only used in the examples and not in the

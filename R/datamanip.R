@@ -7,11 +7,11 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: datamanip.R,v 1.5 2004/02/15 23:35:30 wrm1 Exp $
+#  $Id: datamanip.R,v 1.7 2005/09/27 08:04:06 wrm1 Exp $
 #
 
 #Mapping from xvec to the beta.vector and back again
@@ -83,7 +83,7 @@ mnl.xvec.mapping <- function (forward=TRUE,base.xvec,work.xvec,beta.vector,
 jacstack.function <- function(X,tvars.unique,xvec) {
   xdim  <- dim(X)
   obs   <- xdim[1]
-  nvars <- xdim[2]
+#  nvars <- xdim[2]
   ncats <- xdim[3]
 
   jacstack <- array(0,dim=c(obs,tvars.unique,ncats));

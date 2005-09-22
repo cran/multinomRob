@@ -7,11 +7,11 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: simulation.functions2.R,v 1.2 2004/02/14 06:28:13 wrm1 Exp $
+#  $Id: simulation.functions2.R,v 1.3 2005/09/23 03:12:42 wrm1 Exp $
 #
 
 # Generate single random Multinomial(n,pr)

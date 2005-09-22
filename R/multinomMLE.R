@@ -7,11 +7,11 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: multinomMLE.R,v 1.9 2005/06/13 06:37:02 wrm1 Exp $
+#  $Id: multinomMLE.R,v 1.11 2005/09/27 08:04:06 wrm1 Exp $
 #
 ## multinomMLE:  maximum likelihood estimator for grouped multinomial GLM, with overdispersion
 ##   Y:  matrix of (overdispersed and contaminated) multinomial counts
@@ -140,7 +140,7 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
   ## begin definition of variables used in GNstep that do not change over iterations
   nobs <- dim(Y)[1]
   ncats <- dim(Y)[2]
-  catidx <- 1:(ncats-1);
+#  catidx <- 1:(ncats-1);
   tvars.total <- dim(Xarray)[2]
   tvunique <- dim(jacstack)[2]
   mvec <- c(Y %*% rep(1,dim(Y)[2]));

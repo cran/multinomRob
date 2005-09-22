@@ -7,11 +7,11 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: multinomT.R,v 1.7 2005/06/13 06:37:02 wrm1 Exp $
+#  $Id: multinomT.R,v 1.9 2005/09/27 08:04:06 wrm1 Exp $
 #
 #
 
@@ -101,7 +101,7 @@ mt.mle  <- function (Xarray, xvec, jacstack, y, stack.index,
 {
   nvars  <- dim(Xarray)[2];
   Diag <- function(x) diag(x, nrow = length(x), ncol = length(x))
-  y.name <- deparse(substitute(y))
+#  y.name <- deparse(substitute(y))
   y.names <- dimnames(y)[[2]]
   y <- as.matrix(y)
   if (missing(freq) | is.na(freq)) {
@@ -169,7 +169,7 @@ mt.mle  <- function (Xarray, xvec, jacstack, y, stack.index,
       }
   Ainv <- backsolve(A, diag(d))
   Omega <- Ainv %*% Diag(1/D) %*% t(Ainv)
-  omega <- sqrt(diag(Omega))
+#  omega <- sqrt(diag(Omega))
 #  dimnames(beta) <- list(x.names, y.names)
   dimnames(Omega) <- list(y.names, y.names)
   info <- opt$hessian/2
@@ -301,7 +301,7 @@ mt.dev.grad  <- function (param, Xarray, xvec, jacstack, y, stack.index, nvars, 
     L <- as.vector(u %*% eta)
     t. <- L * sqrt((df + d)/(Q + df))
     dlogft <- -(df + d)/(2 * df * (1 + Q/df))
-    dt.dL <- sqrt((df + d)/(Q + df))
+#    dt.dL <- sqrt((df + d)/(Q + df))
     dt.dQ <- (-0.5) * L * sqrt(df + d)/(Q + df)^1.5
     T. <- pt(t., df + d)
     dlogT. <- dt(t., df + d)/T.

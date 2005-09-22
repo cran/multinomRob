@@ -1,4 +1,4 @@
-% $Id: mGNtanh.Rd,v 1.6 2004/04/12 02:59:16 wrm1 Exp $
+% $Id: mGNtanh.Rd,v 1.7 2005/09/23 03:12:42 wrm1 Exp $
 %
 \name{Multinomial Regression Tanh Estimator Gauss-Newton Optimization}
 \alias{mGNtanh}
@@ -128,13 +128,13 @@
   \url{http://macht.arts.cornell.edu/wrm1/multinom.pdf}
 
   For the most current code and related material see
-  \url{http://jsekhon.fas.harvard.edu/robust/}
+  \url{http://sekhon.polisci.berkeley.edu/robust/}
 }
 \author{Walter R. Mebane, Jr., Cornell University,
   \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr
 
-  Jasjeet S. Sekhon, Harvard University, \email{jasjeet\_sekhon@harvard.edu},
-  \url{http://jsekhon.fas.harvard.edu/}}
+  Jasjeet S. Sekhon, UC Berkeley, \email{sekhon@berkeley.edu},
+  \url{http://sekhon.polisci.berkeley.edu/}}
 \keyword{robust}
 \keyword{models}
 \keyword{regression}

@@ -7,11 +7,11 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: spec.R,v 1.5 2005/06/13 06:37:02 wrm1 Exp $
+#  $Id: spec.R,v 1.7 2005/09/27 08:04:06 wrm1 Exp $
 #
 
 # functions to interpret model formula specifications and build data to analyze
@@ -72,10 +72,7 @@ get.ydata <- function(formul, datafr) {
 get.xy <- function(formlist, datafr, print.level=0) {
   ncats <- length(formlist);
   nobs <- dim(datafr)[1];  # assume all variables are the same length
-  Y <- NULL;
-  Xlist <- list();
   ynames <- rep("", ncats);
-  xlengths <- rep(0, ncats);
   # find negative response values and missing response or regressor variable values
   # if y[j,i] is negative, ignore missing data in x[j,i]
   ypos <- matrix(FALSE, nobs, ncats);  #  in ypos, FALSE is y<0, TRUE is y>=0 or is.na(y)

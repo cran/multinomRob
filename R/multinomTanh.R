@@ -7,11 +7,11 @@
 #  wrm1@macht.arts.cornell.edu
 #
 #  Jasjeet Singh Sekhon 
-#  Harvard University
-#  http://jsekhon.fas.harvard.edu/
-#  jsekhon@fas.harvard.edu
+#  UC Berkeley
+#  http://sekhon.polisci.berkeley.edu
+#  sekhon@berkeley.edu
 #
-#  $Id: multinomTanh.R,v 1.13 2005/06/13 06:37:02 wrm1 Exp $
+#  $Id: multinomTanh.R,v 1.15 2005/09/27 08:04:06 wrm1 Exp $
 #
 #
 # mGNtanh, multinomTanh and robustified.leverage
@@ -252,7 +252,7 @@ mGNtanh <- function(bstart, sigma2, resstart,
   ## begin definition of variables used in GNstep that do not change over iterations
   nobs <- dim(Y)[1]
   ncats <- dim(Y)[2]
-  catidx <- 1:(ncats-1);
+#  catidx <- 1:(ncats-1);
   tvars.total <- dim(Xarray)[2]
   tvunique <- dim(jacstack)[2]
   mvec <- c(Y %*% rep(1,dim(Y)[2]));
@@ -384,7 +384,7 @@ mGNtanh <- function(bstart, sigma2, resstart,
     bvec <- GNlist$coeff;
     wlist <- weights(Y,Ypos,Xarray,GNlist$tvec,sigma2,ncats);
     wmat <- wlist$w;
-    wmatNA <- wlist$wNA;
+#    wmatNA <- wlist$wNA;
     if (error>0 || converged(bvec,bprev) & converged(wmat,wprev)) break;
   }
 
@@ -544,7 +544,7 @@ robustified.leverage <- function (tvec, Y, Ypos, Xarray, m, Win,jacstack) {
   W  <- cbind(Win,rep(1,obs));
   
   nobs  <- dim(Y)[1];
-  nvars <- dim(Xarray)[2];
+#  nvars <- dim(Xarray)[2];
   ncats <- dim(Xarray)[3];
 
   y.prob <- mnl.probfunc(Y, Ypos, Xarray, tvec);
