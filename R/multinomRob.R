@@ -28,13 +28,17 @@ multinomRob <-
            iter = FALSE,   # should we iterate
            maxiter = 10,  # maximum number of iterations before we stop
            multinom.t=1,  # 0=no, 1=yes, 2=force should we do multinom-t for starting values
-           multinom.t.df=NA #if set, the multivariate-t function is FORCED to use this DF 
+           multinom.t.df=NA, #if set, the multivariate-t function is FORCED to use this DF
+           MLEonly=FALSE
            ) 
   {
 
     #check input
     if (print.level < 0)
       print.level  <- 0;
+
+    if(MLEonly!=0 & MLEonly!=1)
+      MLEonly <- FALSE
 
     if (iter!=TRUE & iter!=FALSE)
       {
@@ -225,15 +229,20 @@ multinomRob <-
       Yp[,ncats]  <- 1-apply(as.matrix(Yp[,1:(ncats-1)]),1,sum);
       mnl1 <- multinomMLE(Y=Y, Ypos=Ypos, Xarray=X, xvec=xvec, jacstack=jacstack,
                           xvar.labels=xvar.labels, choice.labels=choice.labels,
+                          MLEonly=MLEonly,
                           print.level=print.level);
 
-      starting.values <- mnl1$coeffvec
-      mnl.fit <-
-        fit.multinomial.C.lqd2(starting.values,X,Y,Ypos,xvec,tvec,ncats,nvars,
-                               nvars.unique,obs,TotalY);
+      if(!MLEonly)
+        {
+          starting.values <- mnl1$coeffvec
+          mnl.fit <-
+            fit.multinomial.C.lqd2(starting.values,X,Y,Ypos,xvec,tvec,ncats,nvars,
+                                   nvars.unique,obs,TotalY);
+        }
       
       if (print.level > 0) {
-        cat("MNL LQD Fit:",mnl.fit,"\n");        
+        if(!MLEonly)
+          cat("MNL LQD Fit:",mnl.fit,"\n");        
         cat("MNL Estimates:\n");
         print(mnl1$coefficients);
         cat("\n");
@@ -241,6 +250,21 @@ multinomRob <-
         print(mnl1$se);        
         cat("\n");
       }
+
+      if(MLEonly)
+        {
+          z <- list(coefficients=mnl1$coefficients,
+                    se=mnl1$se,
+                    mnl=mnl1,
+                    fitted.values=mnl1$fitted.prob,
+                    deviance=as.real(mnl1$GNlist$LLvals)*2,
+                    value=as.real(mnl1$GNlist$LLvals),
+                    error=mnl1$error,
+                    type="MLEonly"
+                    )
+          class(z)  <- "multinomRob"          
+          return(z)
+        }
 
       starting.values.user  <- starting.values
       tvec    <- mnl.xvec.mapping(forward=FALSE,xvec,tvec,starting.values,
@@ -620,7 +644,8 @@ multinomRob <-
                genoud = genoud.out,
                mtanh = mout$mtanh,
                error = error,
-               iter = s.count); #the iter number at the solution
+               iter = s.count,#the iter number at the solution
+               type="robust"); 
     class(z)  <- "multinomRob"
     return(z)
   }
@@ -638,66 +663,112 @@ summary.multinomRob <- function(object, ..., digits=3, weights=FALSE)
     return(NULL)
   } 
 
-  out.mtanh <- list()
-
-  if (!is.null(object$mtanh) && is.list(object$mtanh) && object$mtanh$error == 0) {
-    ncats <- NCOL(object$mtanh$coefficients);
-    nx <- NROW(object$mtanh$coefficients);
-    # find length of longest regressor label
-    labmax <- 0;
-    for (i in 1:ncats) {
-      for (j in 1:nx) {
-        labn <- nchar(strsplit(row.names(object$mtanh$se)[j], "/")[[1]][i]) ;
-        if (labmax < labn) labmax <- labn;
-      }
-    }
-    # generate a blank variable with as many spaces as the longest label
-    spc <- " ";
-    blank <- "";
+  if(object$type!="MLEonly")
+    {
+      out.mtanh <- list()
+      
+      if (!is.null(object$mtanh) && is.list(object$mtanh) && object$mtanh$error == 0) {
+        ncats <- NCOL(object$mtanh$coefficients);
+        nx <- NROW(object$mtanh$coefficients);
+                                        # find length of longest regressor label
+        labmax <- 0;
+        for (i in 1:ncats) {
+          for (j in 1:nx) {
+            labn <- nchar(strsplit(row.names(object$mtanh$se)[j], "/")[[1]][i]) ;
+            if (labmax < labn) labmax <- labn;
+          }
+        }
+                                        # generate a blank variable with as many spaces as the longest label
+        spc <- " ";
+        blank <- "";
     for (i in 1:labmax) blank <- paste(spc, blank, sep="");
-
-    for (i in 1:ncats) {
-      tmp <- as.data.frame(
-               list("Est" = object$mtanh$coefficients[,i],
-                    "SE Sand" = object$mtanh$se[,i],
-#                    "SE OPG"  = object$mtanh$se.opg[,i],
-#                    "SE Hess" = object$mtanh$se.hes[,i],
-                    "t-val Sand" = object$mtanh$coefficients[,i]/object$mtanh$se[,i]))
-      tmp <- as.matrix(tmp);
-      rn <- rep(blank, nx);
-      for (j in 1:nx) {
-        rnj <- strsplit(row.names(object$mtanh$se)[j], "/")[[1]][i] ;
-        substr(rn[j], 1, nchar(rnj)) <- rnj;
-      }
-      dimnames(tmp)[[1]] <- rn;
-      out.mtanh[[i]] <- tmp
-      choice.lables  <- labels(object$coefficients)[[2]]
-      cat("\nChoice",i,":",choice.lables[i],"Estimates and SE:\n")
-      print(signif(tmp,digits=digits))
-      cat("\n")
-    }
-
-    cat("\n");
-    cat("LQD sigma:",sqrt(object$LQDsigma2),"\n")
-    cat("TANH sigma:",sqrt(object$TANHsigma2),"\n\n")
         
-    indx  <- object$weights[,2:ncats]==0;
-    indx[is.na(indx)] <- FALSE;
-    if (ncats==2) indx <- matrix(indx, length(indx), 1);
-    w0.obs    <- sum(apply(indx,1,any));
-    cat("Number of Observations:",NROW(object$prob),"\n")
-    cat("Number of observations with at least one zero weight:",w0.obs,"\n")
-    w0  <- sum(indx)
-    cat("Number of zero weights:",w0,"\n")
+        for (i in 1:ncats) {
+          tmp <- as.data.frame(
+                               list("Est" = object$mtanh$coefficients[,i],
+                                    "SE Sand" = object$mtanh$se[,i],
+                                        #                    "SE OPG"  = object$mtanh$se.opg[,i],
+                                        #                    "SE Hess" = object$mtanh$se.hes[,i],
+                                    "t-val Sand" = object$mtanh$coefficients[,i]/object$mtanh$se[,i]))
+          tmp <- as.matrix(tmp);
+          rn <- rep(blank, nx);
+          for (j in 1:nx) {
+            rnj <- strsplit(row.names(object$mtanh$se)[j], "/")[[1]][i] ;
+            substr(rn[j], 1, nchar(rnj)) <- rnj;
+          }
+          dimnames(tmp)[[1]] <- rn;
+          out.mtanh[[i]] <- tmp
+          choice.lables  <- labels(object$coefficients)[[2]]
+          cat("\nChoice",i,":",choice.lables[i],"Estimates and SE:\n")
+          print(signif(tmp,digits=digits))
+          cat("\n")
+        }
+        
+        cat("\n");
+        cat("LQD sigma:",sqrt(object$LQDsigma2),"\n")
+        cat("TANH sigma:",sqrt(object$TANHsigma2),"\n\n")
+        
+        indx  <- object$weights[,2:ncats]==0;
+        indx[is.na(indx)] <- FALSE;
+        if (ncats==2) indx <- matrix(indx, length(indx), 1);
+        w0.obs    <- sum(apply(indx,1,any));
+        cat("Number of Observations:",NROW(object$prob),"\n")
+        cat("Number of observations with at least one zero weight:",w0.obs,"\n")
+        w0  <- sum(indx)
+        cat("Number of zero weights:",w0,"\n")
+        
+        if (weights) {
+          cat("TANH: weights\n");
+          print(object$weights);
+        }
+      }
+      else {
+        stop("error encountered in tanh result object");
+      }
+    } else { #END OF !MLEonly
 
-    if (weights) {
-      cat("TANH: weights\n");
-      print(object$weights);
-    }
-  }
-  else {
-    print("error encountered in tanh result object");
-  }
+      if (!is.null(object$mnl) && is.list(object$mnl) && object$mnl$error == 0) {
+        ncats <- NCOL(object$mnl$coefficients);
+        nx <- NROW(object$mnl$coefficients);
+                                        # find length of longest regressor label
+        labmax <- 0;
+        for (i in 1:ncats) {
+          for (j in 1:nx) {
+            labn <- nchar(strsplit(row.names(object$mnl$se)[j], "/")[[1]][i]) ;
+            if (labmax < labn) labmax <- labn;
+          }
+        }
+                                        # generate a blank variable with as many spaces as the longest label
+        spc <- " ";
+        blank <- "";
+    for (i in 1:labmax) blank <- paste(spc, blank, sep="");
+        
+        for (i in 1:ncats) {
+          tmp <- as.data.frame(
+                               list("Est" = object$mnl$coefficients[,i],
+                                    "SE Sand" = object$mnl$se[,i],
+                                        #                    "SE OPG"  = object$mnl$se.opg[,i],
+                                        #                    "SE Hess" = object$mnl$se.hes[,i],
+                                    "t-val Sand" = object$mnl$coefficients[,i]/object$mnl$se[,i]))
+          tmp <- as.matrix(tmp);
+          rn <- rep(blank, nx);
+          for (j in 1:nx) {
+            rnj <- strsplit(row.names(object$mnl$se)[j], "/")[[1]][i] ;
+            substr(rn[j], 1, nchar(rnj)) <- rnj;
+          }
+          dimnames(tmp)[[1]] <- rn;
+          choice.lables  <- labels(object$coefficients)[[2]]
+          cat("\nChoice",i,":",choice.lables[i],"Estimates and SE:\n")
+          print(signif(tmp,digits=digits))
+          cat("\n")
+        }
+        
+        cat("\n");
+        cat("Residual Deviance:",as.real(object$deviance),"\n\n")
+      } else {
+        stop("error encountered in MNL result object");      
+      }
+    }#end of MLEonly
 } #end of summary.multinomRob()
 
 
@@ -762,3 +833,18 @@ permute  <- function(Y, Ypos, Xarray, jacstack, tvec, pop, sigma, weight)
     cr <- fn.region.results(tvec, Y, Ypos, Xarray, pop, sigma, Hdiag);    
     return(list(pred=cr$pred, student=cr$student, standard=cr$standard, Hdiag=Hdiag))
   } #end of permute
+
+.onAttach <- function( ... )
+{
+  MatchLib <- dirname(system.file(package = "multinomRob"))
+  version <- packageDescription("multinomRob", lib = MatchLib)$Version
+  BuildDate <- packageDescription("multinomRob", lib = MatchLib)$Date
+  cat(paste("## \n##  multinomRob (Version ", version, ", Build Date: ", BuildDate, ")\n", sep = "")) 
+  cat("##  See http://sekhon.berkeley.edu/robust for additional documentation.\n",
+      "##  Please cite as: Walter R. Mebane, Jr. and Jasjeet S. Sekhon. \"Robust Estimation\n",
+      "##   and Outlier Detection for Overdispersed Multinomial Models of Count Data\".\n",
+      "##   American Journal of Political Science, 48 (April): 391-410. 2004.\n##\n",
+      sep="")
+}
+
+

@@ -26,7 +26,7 @@ rmultinomial(n = 5, pr = c(0.5, 0.5), long = FALSE)
   \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr
 
   Jasjeet S. Sekhon, UC Berkeley, \email{sekhon@berkeley.edu},
-  \url{http://sekhon.polisci.berkeley.edu/}}
+  \url{http://sekhon.berkeley.edu/}}
 }
 \note{
   This function is only used in the examples and not in the

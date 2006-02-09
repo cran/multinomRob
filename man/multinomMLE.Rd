@@ -12,7 +12,7 @@
   called by \code{multinomRob}, which constructs the various arguments.
 }
 \usage{multinomMLE(Y, Ypos, Xarray, xvec, jacstack, itmax=100, xvar.labels,
-                   choice.labels, print.level)
+                   choice.labels, MLEonly=FALSE, print.level=0)
 }
 \arguments{
   \item{Y}{
@@ -41,6 +41,9 @@
     Vector of labels for observations.}
   \item{choice.labels}{
     Vector of labels for outcome alternatives.}
+  \item{MLEonly}{
+    If \code{TRUE}, then only the standard maximum-likelihood MNL model
+    is estimated---i.e., no overdispersion parameter is estimated.}  
   \item{print.level}{
     Specify 0 for minimal printing (error messages only) or 3 to print details
     about the MLE computations.}
@@ -53,8 +56,8 @@
   the coefficient estimates, with little efficiency loss.
 }
 \value{
-  multinomMLE returns a list of 20 objects.  The returned objects are:
-
+  multinomMLE returns a list containing the following objects.  The
+  returned objects are:
    \item{coefficients}{
      The maximum likelihood coefficient estimates in matrix format.  The value 0 is
      used in the matrix to fill in for values that do not correspond to a
@@ -65,21 +68,31 @@
      Moment estimate of the dispersion:  mean sum of squared orthogonalized
      residuals (adjusted for degrees of freedom lost to estimated coefficients).}
    \item{se}{
-     The tanh coefficient estimate standard errors in matrix format.  The
-     format and labelling used for the matrix is the same as is used for the
-     \code{coefficients}.  The standard errors are derived from the estimated
-     asymptotic sandwich covariance estimate.}
+     The MLE coefficient estimate standard errors derived from the asymptotic
+     covariance estimated using the Hessian matrix (observed
+     information).}
    \item{se.opg}{
-     The tanh coefficient estimate standard errors derived from the asymptotic
+     The MLE coefficient estimate standard errors derived from the asymptotic
      covariance estimated using the outer product of the gradient (expected
-     information) divided by the moment estimate of the dispersion.}
+     information) divided by the moment estimate of the dispersion.
+     Not provided if \code{MLEonly==TRUE}.}
    \item{se.hes}{
-     The tanh coefficient estimate standard errors derived from the asymptotic
-     covariance estimated using the hessian matrix (observed information).}
+     The MLE coefficient estimate standard errors derived from the asymptotic
+     covariance estimated using the Hessian matrix (observed
+     information).  Same as \code{se}; included for backward
+     compatibility.}
+   \item{se.sw}{
+     The MLE coefficient estimate standard errors derived from the asymptotic
+     covariance estimated using the estimated asymptotic
+     sandwich covariance estimate. Not provided if \code{MLEonly==TRUE}.}   
    \item{se.vec}{
-     A vector containing the tanh coefficient sandwich estimate standard errors.}
+     \code{se} in vector form.}   
    \item{se.opg.vec}{
-     A vector containing the tanh coefficient OPG estimate standard errors.}
+     \code{se.opg} in vector form.}
+   \item{se.hes.vec}{
+     \code{se.hes} in vector form.}      
+   \item{se.sw.vec}{
+     \code{se.sw} in vector form.}   
    \item{A}{
      The outer product of the gradient (expected information) divided by the
      moment estimate of the dispersion.}
@@ -119,17 +132,16 @@
 \references{
   Walter R. Mebane, Jr. and  Jasjeet Singh Sekhon. 2004.  ``Robust Estimation
   and Outlier Detection for Overdispersed Multinomial Models of Count Data.'' 
-  \emph{American Journal of Political Science} 48 (April): 391--410 .
-  \url{http://macht.arts.cornell.edu/wrm1/multinom.pdf}
+  \emph{American Journal of Political Science} 48 (April): 391--410.
+  \url{http://sekhon.berkeley.edu/multinom.pdf}
 
-  For the most current code and related material see
-  \url{http://sekhon.polisci.berkeley.edu/robust/}
+  For additional documentation please visit \url{http://sekhon.berkeley.edu/robust/}.
 }
 \author{Walter R. Mebane, Jr., Cornell University,
   \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr
 
   Jasjeet S. Sekhon, UC Berkeley, \email{sekhon@berkeley.edu},
-  \url{http://sekhon.polisci.berkeley.edu/}}
+  \url{http://sekhon.berkeley.edu/}}
 }
 \keyword{models}
 \keyword{regression}

@@ -40,7 +40,7 @@
 ##      dim(jacstack) = c(n observations, n UNIQUE parameters, n categories)
 multinomMLE <- function(Y, Ypos, Xarray, xvec, 
                         jacstack, itmax=100,
-                        xvar.labels, choice.labels, print.level=0) {
+                        xvar.labels, choice.labels, MLEonly=FALSE,print.level=0) {
   ## probfunc: matrix of estimated probabilities
   probfunc <-
     function(Y, Ypos, Xarray, tvec) {
@@ -150,6 +150,11 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
   #starting values
   bvec <- rep(1,tvunique)
 
+  if ((nobs-tvunique) <=0 & !MLEonly)
+    {
+      stop("too few observations to estimate overdispersed MNL.  You may want to set the 'MLEonly' option to true.")
+    }
+
   LogLik <-
     function(Y,Ypos,ipmatS,mvecS) {
       LLu <- -sum(Y[Ypos] * log(ipmatS[Ypos]));  ## negative loglikelihood
@@ -159,7 +164,7 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
 
   ## Newton algorithm given data
   GNstep <-
-    function(bvec,sigma2GN,itmaxGN=100) {
+    function(bvec,itmaxGN=100) {
       tvec <- mnl.xvec.mapping(forward=FALSE,xvec,tvec,bvec, ncats,tvars.total);
       itersGN <- 0;
       ## patterned after the Gauss-Newton algorithm in Gallant 1987, 28-29
@@ -175,7 +180,7 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
           scorefunc(Ypos, nobs, tvunique, mvec, presmat, jacstack);
         hess2 <- hessianfunc(Ypos, nobs, tvunique, ipmat, mvec, jacstack) / nobs;
         posdef <- all(eigen(hess2, symmetric=TRUE, only.values=TRUE)$values > 0);
-        gradient <- (score %*% rep(1,nobs)) / sqrt(sigma2GN) / nobs ;
+        gradient <- (score %*% rep(1,nobs)) / nobs ;
         if (!posdef) {
           convflag <- FALSE;
           break;  ## quit if Hessian is not positive definite
@@ -235,10 +240,15 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
     bprev <- bvec;
 
     tvec <- mnl.xvec.mapping(forward=FALSE,xvec,tvec,bvec, ncats,tvars.total);
-    sigma2  <- sum(resfunc(Y,Ypos,Xarray,tvec)^2)/(nobs-tvunique);
+    if(MLEonly)
+      {
+        sigma2 <- 1
+      } else {
+        sigma2  <- sum(resfunc(Y,Ypos,Xarray,tvec)^2)/(nobs-tvunique);
+      }
 
     ## grouped multinomial:  estimate using Newton algorithm
-    GNlist <- GNstep(bvec,sigma2);
+    GNlist <- GNstep(bvec);
     error <- ifelse(GNlist$posdef,0,32);  ## error == 32 if hessian not posdefinite
     if (print.level > 32)
       print(paste("multinomMLE: number of Newton iterations", GNlist$iters));
@@ -266,20 +276,42 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
   ## 0    no errors
   ## 32  Hessian not positive definite in the final Newton step
 
-  se.opg.vec  <- sqrt(diag(ginv(opg/sigma2)));
   se.hes.vec <- sqrt(diag(obsformation));
-  se.vec     <- sqrt(diag(rcovmat));
+  if(MLEonly)
+    {
+      se.rcov.vec <- rep(NA, length(diag(rcovmat)));
+      se.opg.vec  <- rep(NA, length(diag(rcovmat)));      
+    } else {
+      se.rcov.vec     <- sqrt(diag(rcovmat));
+      se.opg.vec  <- sqrt(diag(ginv(opg/sigma2)));
+    }
+  se.vec     <- se.hes.vec
 
   se.opg <- xvec;
   se.hes <- xvec;
+  se.rcov <- xvec;
   se     <- xvec;    
 
-  se.opg <- as.data.frame(mnl.xvec.mapping(forward=FALSE,xvec,se.opg,se.opg.vec,
-                                           ncats,tvars.total));
   se.hes <- as.data.frame(mnl.xvec.mapping(forward=FALSE,xvec,se.hes,se.hes.vec,
                                            ncats,tvars.total));
   se <- as.data.frame(mnl.xvec.mapping(forward=FALSE,xvec,se,se.vec,
                                        ncats,tvars.total));
+  if(MLEonly)
+    {
+      se.opg <- NA
+      se.rcov <- NA
+    } else {
+      se.opg <- as.data.frame(mnl.xvec.mapping(forward=FALSE,xvec,se.opg,se.opg.vec,
+                                               ncats,tvars.total));
+      se.rcov <- as.data.frame(mnl.xvec.mapping(forward=FALSE,xvec,se.rcov,se.rcov,
+                                                ncats,tvars.total));
+
+      row.names(se.opg) <- xvar.labels;
+      names(se.opg)     <- choice.labels;
+
+      row.names(se.rcov) <- xvar.labels;
+      names(se.rcov)     <- choice.labels;  
+    }
   tvec  <- as.data.frame(tvec)
 
   row.names(tvec) <- xvar.labels;
@@ -288,16 +320,13 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
   row.names(se) <- xvar.labels;
   names(se)     <- choice.labels;
 
-  row.names(se.opg) <- xvar.labels;
-  names(se.opg)     <- choice.labels;
-
   row.names(se.hes) <- xvar.labels;
   names(se.hes)     <- choice.labels;
 
   return(
          list(coefficients=GNlist$tvec, coeffvec=GNlist$coeff, dispersion=sigma2,
-              se=se, se.opg=se.opg, se.hes=se.hes,
-              se.vec=se.vec, se.opg.vec=se.opg.vec,se.hes.vec=se.hes.vec,
+              se=se, se.opg=se.opg, se.hes=se.hes, se.sw=se.rcov,
+              se.vec=se.vec, se.opg.vec=se.opg.vec,se.hes.vec=se.hes.vec,se.sw.vec=se.rcov.vec,
               A=opg/sigma2, B=obsformation, covmat=rcovmat,
               iters=iters, error=error,
               GNlist=GNlist, sigma2=sigma2,

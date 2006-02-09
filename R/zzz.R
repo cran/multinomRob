@@ -11,12 +11,12 @@
 #  http://sekhon.polisci.berkeley.edu
 #  sekhon@berkeley.edu
 #
-#  $Id: zzz.R,v 1.7 2005/09/27 08:04:06 wrm1 Exp $
+#  $Id: zzz.R,v 1.8 2005/10/29 06:44:03 wrm1 Exp $
 #
 
 # use .onLoad instead of .First.lib for use with NAMESPACE and R(>= 1.7.0)
 .onLoad <- function(lib, pkg) {
-  library.dynam(pkg, pkg, lib)
+  library.dynam("multinomRob", pkg, lib)
   require("rgenoud")||
     cat("ERROR: library 'rgenoud' is needed by 'multinomRob' and is missing\n")
   require("MASS")   ||

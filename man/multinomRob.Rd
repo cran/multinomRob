@@ -11,7 +11,8 @@
 \usage{
   multinomRob(model, data, starting.values=NULL,  equality=NULL,
               genoud.parms=NULL, print.level=0, iter = FALSE,
-              maxiter = 10, multinom.t=1, multinom.t.df=NA)
+              maxiter = 10, multinom.t=1, multinom.t.df=NA,
+              MLEonly=FALSE)
 }
 \arguments{
   \item{model}{
@@ -141,7 +142,11 @@
     multivariate-t starting values will be used (depending on the comparison with
     the MNL estimates if \code{multinom.t=1} is set) even if the standard
     errors are not defined.
-    }
+  }
+  \item{MLEonly}{
+    If \code{TRUE}, then only the standard maximum-likelihood MNL model
+    is estimated. No robust estimation model and no overdispersion
+    parameter is estimated.}    
 }
 \details{
   The tanh estimator is a redescending
@@ -233,10 +238,10 @@
      overdispersion scale.}
    \item{mnl}{
      List of nonrobust maximum likelihood estimation results from function
-     \code{multinomMLE}.}
+     \code{\link{multinomMLE}}.}
    \item{multinomT}{
      List of multinomial multivariate-t estimation results from function
-     \code{multinomT}.}
+     \code{\link{multinomT}}.}
    \item{genoud}{
      List of LQD estimation results obtained by rgenoud optimization, from
      function \code{genoudRob}.}
@@ -250,17 +255,16 @@
 \references{
   Walter R. Mebane, Jr. and  Jasjeet Singh Sekhon. 2004.  ``Robust Estimation
   and Outlier Detection for Overdispersed Multinomial Models of Count Data.'' 
-  \emph{American Journal of Political Science} 48 (April): 391--410 .
-  \url{http://macht.arts.cornell.edu/wrm1/multinom.pdf}
+  \emph{American Journal of Political Science} 48 (April): 391--410.
+  \url{http://sekhon.berkeley.edu/multinom.pdf}
 
-  For the most current code and related material see
-  \url{http://sekhon.polisci.berkeley.edu/robust/}
+  For additional documentation please visit \url{http://sekhon.berkeley.edu/robust/}.
 }
 \author{Walter R. Mebane, Jr., Cornell University,
   \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr
 
   Jasjeet S. Sekhon, UC Berkeley, \email{sekhon@berkeley.edu},
-  \url{http://sekhon.polisci.berkeley.edu/}}
+  \url{http://sekhon.berkeley.edu/}}
 }
 \examples{
 # make some multinomial data
@@ -301,6 +305,11 @@ mulrobE <- multinomRob(list(y1 ~ x1, y2 ~ x2, y3 ~ 0),
                       genoud.parms = zz.genoud.parms,
                       print.level = 3, iter=FALSE);
 summary(mulrobE, weights=TRUE);
+
+#Do only MLE estimation.  The following model is NOT identified if we
+#try to estimate the overdispersed MNL.
+dtf <- data.frame(y1=c(1,1),y2=c(2,1),y3=c(1,2),x=c(0,1))
+summary(multinomRob(list(y1 ~ 0, y2 ~ x, y3 ~ x), data=dtf, MLEonly=TRUE))
 }
 \keyword{robust}
 \keyword{models}
