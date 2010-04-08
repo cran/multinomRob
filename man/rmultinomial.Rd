@@ -22,11 +22,11 @@ rmultinomial(n = 5, pr = c(0.5, 0.5), long = FALSE)
 \value{
   \item{x}{Vector of counts.}
 }
-\author{Walter R. Mebane, Jr., Cornell University,
-  \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr
+\author{Walter R. Mebane, Jr., University of Michigan,
+  \email{wmebane@umich.edu}, \url{http://www-personal.umich.edu/~wmebane} \cr
 
   Jasjeet S. Sekhon, UC Berkeley, \email{sekhon@berkeley.edu},
-  \url{http://sekhon.berkeley.edu/}}
+  \url{http://sekhon.berkeley.edu/}
 }
 \note{
   This function is only used in the examples and not in the

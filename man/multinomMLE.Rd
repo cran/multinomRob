@@ -137,11 +137,11 @@
 
   For additional documentation please visit \url{http://sekhon.berkeley.edu/robust/}.
 }
-\author{Walter R. Mebane, Jr., Cornell University,
-  \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr
+\author{Walter R. Mebane, Jr., University of Michigan,
+  \email{wmebane@umich.edu}, \url{http://www-personal.umich.edu/~wmebane} \cr
 
   Jasjeet S. Sekhon, UC Berkeley, \email{sekhon@berkeley.edu},
-  \url{http://sekhon.berkeley.edu/}}
+  \url{http://sekhon.berkeley.edu/}
 }
 \keyword{models}
 \keyword{regression}

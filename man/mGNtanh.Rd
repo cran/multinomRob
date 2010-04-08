@@ -2,7 +2,7 @@
 %
 \name{Multinomial Regression Tanh Estimator Gauss-Newton Optimization}
 \alias{mGNtanh}
-\title{Multinomial Regression Hyperbolic Tangenet (Tanh) Estimator Gauss-Newton Optimization}
+\title{Multinomial Regression Hyperbolic Tangent (Tanh) Estimator Gauss-Newton Optimization}
 \description{
   \code{mGNtanh} uses Gauss-Newton optimization to compute the
   hyperbolic tangent (tanh) estimator for the overdispersed multinomial
@@ -35,14 +35,14 @@
     It has a 1 for an estimated parameter, an integer greater than 1 for an
     estimated parameter constrained equal to another estimated parameter (all
     parameters constrained to be equal to one another have the same integer
-    value in xvec) and a 0 otherwize.}
+    value in xvec) and a 0 otherwise.}
   \item{tvec}{
     Starting values for the regression coefficient parameters, as a matrix
     (parameters by alternatives).  Parameters that are involved in equality
     constraints are repeated in tvec.}
   \item{jacstack}{
     Array of regressors used to facilitate computing the gradient and the
-    hessian matrix.
+    Hessian matrix.
     dim(jacstack) = c(observations, unique parameters, alternatives).}
   \item{itmax}{
     Maximum number of Gauss-Newton stages.  Each stage does at most 100 Gauss-Newton
@@ -82,7 +82,7 @@
     The outer product of the gradient (expected information) divided by the
     moment estimate of the dispersion.}
   \item{B}{
-    The inverse of the hessian matrix (observed formation).}
+    The inverse of the Hessian matrix (observed formation).}
   \item{covmat}{
     Sandwich estimate of the asymptotic covariance of the tanh coefficient estimates.}
   \item{iters}{
@@ -129,8 +129,8 @@
 
   For additional documentation please visit \url{http://sekhon.berkeley.edu/robust/}.
 }
-\author{Walter R. Mebane, Jr., Cornell University,
-  \email{wrm1@cornell.edu}, \url{http://macht.arts.cornell.edu/wrm1/} \cr
+\author{Walter R. Mebane, Jr., University of Michigan,
+  \email{wmebane@umich.edu}, \url{http://www-personal.umich.edu/~wmebane} \cr
 
   Jasjeet S. Sekhon, UC Berkeley, \email{sekhon@berkeley.edu},
   \url{http://sekhon.berkeley.edu/}}
