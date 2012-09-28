@@ -288,9 +288,20 @@ y3 <- y[,3];
 dtf <- data.frame(x1, x2, y1, y2, y3);
 
 ## Set parameters for Genoud
+\dontrun{
+## For production, use these kinds of parameters
 zz.genoud.parms <- list( pop.size             = 1000,
                         wait.generations      = 10,
                         max.generations       = 100,
+                        scale.domains         = 5,
+                        print.level = 0
+                        )
+}
+
+## For testing, we are setting the parmeters to run quickly. Don't use these for production
+zz.genoud.parms <- list( pop.size             = 10,
+                        wait.generations      = 1,
+                        max.generations       = 1,
                         scale.domains         = 5,
                         print.level = 0
                         )

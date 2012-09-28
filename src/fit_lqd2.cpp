@@ -5,14 +5,13 @@
   http://jsekhon.fas.harvard.edu/
   jsekhon@fas.harvard.edu
 
-  $Id: fit_lqd2.cpp,v 1.4 2004/04/12 02:59:16 wrm1 Exp $
-
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <R.h>
+#include <Rdefines.h>
 
 long bcacmp(double *a, double *b);
 void multi(double **in1, double **in2, double **out,
@@ -48,7 +47,7 @@ extern "C"
     nvars_total  = asInteger(I_nvars_total);
     nvars_unique = asInteger(I_nvars_unique);
 
-    // printf("nobs: %d\n",nobs);
+    // Rprintf("nobs: %d\n",nobs);
 
     Y        = (double **) calloc(nobs,sizeof(double));
     Yprob    = (double **) calloc(nobs,sizeof(double));
@@ -88,7 +87,7 @@ extern "C"
 	  {
 	    vec[k][j] = REAL(I_vec)[count];
 	    count++;
-	    // printf("vec[%d][%d]: %lf\n", k, j, vec[k][j]);
+	    // Rprintf("vec[%d][%d]: %lf\n", k, j, vec[k][j]);
 	  }
       }
 
@@ -100,7 +99,7 @@ extern "C"
 	  {
 	    Y[i][k] = REAL(I_Yvector)[count];
 	    count++;
-	    // printf("Y[%d][%d]: %lf\n", i, k, Y[i][k]);
+	    // Rprintf("Y[%d][%d]: %lf\n", i, k, Y[i][k]);
 	  } // end of i
       } // end of k
 
@@ -113,7 +112,7 @@ extern "C"
 	    for (i=0; i<nobs; i++)
 	      {
 		Xarray[i][j][k] = REAL(I_Xvector)[count];
-		// printf("Xarray[%d][%d][%d]: %lf\n", i, j, k, Xarray[i][j][k]);
+		// Rprintf("Xarray[%d][%d][%d]: %lf\n", i, j, k, Xarray[i][j][k]);
 		count++;
 	      } // end of i
 	  } // J
@@ -146,7 +145,7 @@ extern "C"
 	  {
 	    Yprob[i][j] = 1/foo * exp(mu[i][j]);
 
-	    // printf("Yprob[%d][%d]: %lf, mu: %lf\n", 
+	    // Rprintf("Yprob[%d][%d]: %lf, mu: %lf\n", 
 	    // i, j, Yprob[i][j], mu[i][j]);
 	  }
       } // end of i;
@@ -205,7 +204,7 @@ extern "C"
     for (i=0; i<obs; i++)
       {
 	SortVector[i] = REAL(I_SortVector)[i];
-	//	printf("SortVector[%d]: %lf\n", i+1, SortVector[i]);
+	//	Rprintf("SortVector[%d]: %lf\n", i+1, SortVector[i]);
       }// end of i loop
 
     ReturnElement = kth_smallest(SortVector, obs, rank);
@@ -334,7 +333,7 @@ void ResStd(double **SresRaw, double **Y, double *weights, double **Yprob,
 	{
 	  SresRaw[i][j] = Or[i][j]/sqrt(weights[i]*D[i][j]);
 
-	  //printf("SresRaw[%d][%d]: %lf, Or: %lf, weights: %lf, D: %lf\n", 
+	  //Rprintf("SresRaw[%d][%d]: %lf, Or: %lf, weights: %lf, D: %lf\n", 
 	  // i, j, SresRaw[i][j], Or[i][j], weights[i], D[i][j]);
 	} // end of j
     } // end of i
@@ -368,8 +367,7 @@ void multi(double **in1, double **in2, double **out,
   long oi, oj, i;
   
   if (col1!=row2) {
-    fprintf(stdout,"\nTHE MATRICES ARE NOT CONFORMABLE FOR MULIPLICATION\n");
-    fprintf(stderr,"\nTHE MATRICES ARE NOT CONFORMABLE FOR MULIPLICATION\n");
+    error("The Matrices are not conformable for muliplication");
     return;
   }
   
@@ -413,7 +411,7 @@ double lqd2(double **SresRaw, long nobs, long nvars_unique, long ncats)
 	{
 
 	  rawres[count] = SresRaw[i][j];
-	  //printf("rawres[%d] %lf, SresRaw[%d][%d]: %lf\n", count, rawres[count], i, j, SresRaw[i][j]);
+	  //Rprintf("rawres[%d] %lf, SresRaw[%d][%d]: %lf\n", count, rawres[count], i, j, SresRaw[i][j]);
 	  count++;
 	} // end of j
     } // end of i
@@ -437,7 +435,7 @@ double lqd2(double **SresRaw, long nobs, long nvars_unique, long ncats)
 
     if (!R_finite(fit_lqd2))
       {
-	  /* printf("XXX\n"); */
+	  /* Rprintf("XXX\n"); */
 	  fit_lqd2 = 999991234;
       }
 

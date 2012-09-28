@@ -620,7 +620,7 @@ multinomRob <-
           jacstackTmp  <- jacstack[,,c(tindx), drop=FALSE]
           tvec  <- as.matrix(mout$mtanh$coefficients[,c(tindx), drop=FALSE])
           
-          foo  <- permute(Y=YTmp, Ypos=YposTmp, X=XTmp,
+          foo  <- permute(Y=YTmp, Ypos=YposTmp, Xarray=XTmp,
                           jacstack=jacstackTmp, tvec=tvec,
                           pop=TotalY, sigma=sqrt(mout$mtanh$disp),
                           weight=mout$mtanh$w)
@@ -837,14 +837,16 @@ permute  <- function(Y, Ypos, Xarray, jacstack, tvec, pop, sigma, weight)
 .onAttach <- function( ... )
 {
   MatchLib <- dirname(system.file(package = "multinomRob"))
-  version <- packageDescription("multinomRob", lib = MatchLib)$Version
-  BuildDate <- packageDescription("multinomRob", lib = MatchLib)$Date
-  cat(paste("## \n##  multinomRob (Version ", version, ", Build Date: ", BuildDate, ")\n", sep = "")) 
-  cat("##  See http://sekhon.berkeley.edu/robust for additional documentation.\n",
-      "##  Please cite as: Walter R. Mebane, Jr. and Jasjeet S. Sekhon. \"Robust Estimation\n",
-      "##   and Outlier Detection for Overdispersed Multinomial Models of Count Data\".\n",
-      "##   American Journal of Political Science, 48 (April): 391-410. 2004.\n##\n",
-      sep="")
+  version <- packageDescription("multinomRob", lib.loc = MatchLib)$Version
+  BuildDate <- packageDescription("multinomRob", lib.loc = MatchLib)$Date
+
+  foo <- paste("## \n##  multinomRob (Version ", version, ", Build Date: ", BuildDate, ")\n",
+               "##  See http://sekhon.berkeley.edu/robust for additional documentation.\n",
+               "##  Please cite as: Walter R. Mebane, Jr. and Jasjeet S. Sekhon. \"Robust Estimation\n",
+               "##   and Outlier Detection for Overdispersed Multinomial Models of Count Data\".\n",
+               "##   American Journal of Political Science, 48 (April): 391-410. 2004.\n##\n",
+               sep="")
+  packageStartupMessage(foo)
 }
 
 

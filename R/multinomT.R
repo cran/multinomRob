@@ -97,7 +97,7 @@ multinomT  <- function(Yp, Xarray, xvec, jacstack,
 
 mt.mle  <- function (Xarray, xvec, jacstack, y, stack.index,
           start = NA, freq =NA, fixed.df = NA, trace = FALSE,
-          method = "BFGS", control = list(maxit = 600,trace=0, tol=1e-100)) 
+          method = "BFGS", control = list(maxit = 600,trace=0)) 
 {
   nvars  <- dim(Xarray)[2];
   Diag <- function(x) diag(x, nrow = length(x), ncol = length(x))

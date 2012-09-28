@@ -185,7 +185,7 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
           convflag <- FALSE;
           break;  ## quit if Hessian is not positive definite
         }
-        bdiff <- c(solve(hess2, tol=.Machine$double.eps, LINPACK=TRUE) %*% gradient) ;  ## one Newton step
+        bdiff <- c(solve(hess2, tol=.Machine$double.eps) %*% gradient) ;  ## one Newton step
         ## print(bdiff);
         for (lambda in c(10:6)/10) {
           blambda <- bvec + lambda * bdiff;
@@ -224,7 +224,7 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
       }
       information <- hessianfunc(Ypos, nobs, tvunique, ipmat, mvec, jacstack);
       if (all(eigen(information, symmetric=TRUE, only.values=TRUE)$values > 0)) {
-        formation <- solve(information, tol=.Machine$double.eps, LINPACK=TRUE);
+        formation <- solve(information, tol=.Machine$double.eps);
       }
       else {
         formation <- NA;
@@ -267,7 +267,7 @@ multinomMLE <- function(Y, Ypos, Xarray, xvec,
     }
     else {
       print(paste("multinomMLE: hessian determinant:",
-        det(solve(obsformation, tol=.Machine$double.eps, LINPACK=TRUE))));
+        det(solve(obsformation, tol=.Machine$double.eps))));
     }
     print(paste("multinomMLE: OPG determinant:", det(opg)));
   }
