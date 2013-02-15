@@ -2,9 +2,9 @@
 #  multinomRob
 #
 #  Walter R. Mebane, Jr.
-#  Cornell University
-#  http://macht.arts.cornell.edu/wrm1/
-#  wrm1@macht.arts.cornell.edu
+#  University of Michigan
+#  http://www-personal.umich.edu/~wmebane
+#  <wmebane@umich.edu>
 #
 #  Jasjeet Singh Sekhon 
 #  UC Berkeley
@@ -35,10 +35,10 @@ fit.multinomial.C.lqd2 <- function(foo,X,Y,Ypos,xvec,tvec,ncats,nvars,nvars.uniq
                  as.integer(ncats),
                  as.integer(nvars),
                  as.integer(nvars.unique),
-                 as.real(tmp.vec),
-                 as.real(Y),
-                 as.real(X),
-                 as.real(TotalY),
+                 as.double(tmp.vec),
+                 as.double(Y),
+                 as.double(X),
+                 as.double(TotalY),
                  PACKAGE="multinomRob")
            );
   }

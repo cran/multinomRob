@@ -2,16 +2,15 @@
 #  multinomRob
 #
 #  Walter R. Mebane, Jr.
-#  Cornell University
-#  http://macht.arts.cornell.edu/wrm1/
-#  wrm1@macht.arts.cornell.edu
+#  University of Michigan
+#  http://www-personal.umich.edu/~wmebane
+#  <wmebane@umich.edu>
 #
 #  Jasjeet Singh Sekhon 
 #  UC Berkeley
 #  http://sekhon.polisci.berkeley.edu
 #  sekhon@berkeley.edu
 #
-#  $Id: resstd2.R,v 1.8 2005/09/27 08:04:06 wrm1 Exp $
 #
 
 # probfunc: matrix of estimated probabilities
@@ -117,7 +116,7 @@ kth.smallest  <- function(SortVector, obs, k)
       return(-1);
     }
     return(.Call("kthSmallest",
-                 as.real(SortVector), as.integer(obs), as.integer(k),
+                 as.double(SortVector), as.integer(obs), as.integer(k),
                  PACKAGE="multinomRob"));    
   } #end of kth.smallest
 

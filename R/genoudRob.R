@@ -2,16 +2,15 @@
 #  multinomRob
 #
 #  Walter R. Mebane, Jr.
-#  Cornell University
-#  http://macht.arts.cornell.edu/wrm1/
-#  wrm1@macht.arts.cornell.edu
+#  University of Michigan
+#  http://www-personal.umich.edu/~wmebane
+#  <wmebane@umich.edu>
 #
 #  Jasjeet Singh Sekhon 
 #  UC Berkeley
 #  http://sekhon.polisci.berkeley.edu
 #  sekhon@berkeley.edu
 #
-#  $Id: genoudRob.R,v 1.6 2005/09/27 08:04:06 wrm1 Exp $
 #
 ###################################
 #New Front End for Genoud, with tuned defaults

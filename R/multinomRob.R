@@ -2,9 +2,9 @@
 #  multinomRob
 #
 #  Walter R. Mebane, Jr.
-#  Cornell University
-#  http://macht.arts.cornell.edu/wrm1/
-#  wrm1@macht.arts.cornell.edu
+#  University of Michigan
+#  http://www-personal.umich.edu/~wmebane
+#  <wmebane@umich.edu>
 #
 #  Jasjeet Singh Sekhon 
 #  UC Berkeley
@@ -216,7 +216,7 @@ multinomRob <-
       genoud.parms  <- list(Domains=NULL);
     genoud.parms  <- genoudParms(genoud.parms)
 
-    # initialize with really bad fit values
+    # initialize with terrible fit values
     mnl.fit  <- 9999999999;
     multinomT.fit  <- 9999999999;
     starting.fit   <- 9999999999;
@@ -257,8 +257,8 @@ multinomRob <-
                     se=mnl1$se,
                     mnl=mnl1,
                     fitted.values=mnl1$fitted.prob,
-                    deviance=as.real(mnl1$GNlist$LLvals)*2,
-                    value=as.real(mnl1$GNlist$LLvals),
+                    deviance=as.double(mnl1$GNlist$LLvals)*2,
+                    value=as.double(mnl1$GNlist$LLvals),
                     error=mnl1$error,
                     type="MLEonly"
                     )
@@ -764,7 +764,7 @@ summary.multinomRob <- function(object, ..., digits=3, weights=FALSE)
         }
         
         cat("\n");
-        cat("Residual Deviance:",as.real(object$deviance),"\n\n")
+        cat("Residual Deviance:",as.double(object$deviance),"\n\n")
       } else {
         stop("error encountered in MNL result object");      
       }
